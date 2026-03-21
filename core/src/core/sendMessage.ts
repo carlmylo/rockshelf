@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 
-export interface RendererMessageObject {
+export interface SmallMessageObject {
   /**
    * The type of the message.
    *
@@ -28,13 +28,18 @@ export interface RendererMessageObject {
 }
 
 /**
- * Sends a message event to a renderer process.
+ * Sends a small message event to a renderer process.
  * - - - -
  * @param {BrowserWindow} win Target `BrowserWindow` that will receive the message.
  * @param {MessagePopUpOptions} options Message configuration payload.
  * @returns {true} Always returns true after dispatching the message.
  */
-export const sendMessage = (win: BrowserWindow, options: RendererMessageObject): true => {
-  win.webContents.send('sendMessage', options)
+export const sendSmallMessage = (win: BrowserWindow, options: SmallMessageObject): true => {
+  win.webContents.send('sendSmallMessage', options)
+  return true
+}
+
+export const sendDialog = (win: BrowserWindow, code: string): true => {
+  win.webContents.send('sendDialog', code)
   return true
 }

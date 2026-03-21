@@ -1,3 +1,4 @@
+export * from './app/lib/i18n/mountSmallMessageLocaleKey'
 export * from './app/lib/i18n/TransComponent'
 
 export * from './app/lib/motion/animate'

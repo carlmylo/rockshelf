@@ -1,7 +1,7 @@
 import { app, BrowserWindow, protocol, net } from 'electron'
 import { pathToFileURL } from 'node:url'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { checkDeps, createWindow, getRockshelfModuleRootDir, initMainProcessHandlers, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
+import { checkDeps, createWindow, getRB3USRDIR, getRockshelfModuleRootDir, initMainProcessHandlers, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
 
 export async function initRockshelfMainProcess(options: CreateWindowOptions): Promise<void> {
   await setElectronUserDataFolder(app, 'Rockshelf')
@@ -20,14 +20,17 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     const code = request.url.slice('rbicons://'.length)
     const name = code === 'songPackage' ? 'custom' : code
     let filePath = root.gotoFile(`bin/icons/${name}.webp`)
-    if (!filePath.exists) {
-      filePath = root.gotoFile(`bin/icons/${name}.jpg`)
-      if (!filePath.exists) {
-        filePath = root.gotoFile(`bin/icons/${name}.png`)
-        if (!filePath.exists) filePath = root.gotoFile(`bin/icons/custom.webp`)
-      }
-    }
+    if (!filePath.exists) filePath = root.gotoFile(`bin/icons/custom.webp`)
 
+    return net.fetch(pathToFileURL(filePath.path).toString())
+  })
+
+  protocol.handle('rb3packimg', async (request) => {
+    const userConfig = await readUserConfigFile()
+    if (!userConfig) throw new Error('User config file not found, aborting...')
+    const rb3usrdir = getRB3USRDIR(userConfig.devhdd0Path)
+    const packageFolderName = request.url.slice('rb3packimg://'.length)
+    const filePath = rb3usrdir.gotoFile(`${packageFolderName}/folder.jpg`)
     return net.fetch(pathToFileURL(filePath.path).toString())
   })
 

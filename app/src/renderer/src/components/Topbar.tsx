@@ -1,4 +1,5 @@
-import { CloseIcon, FolderWithPlusIcon, MaximizeIcon, MinimizeIcon, RestoreWinIcon } from '@renderer/assets/icons'
+import { CloseIcon, FolderWithPlusIcon, LoadingIcon, MaximizeIcon, MinimizeIcon, RestoreWinIcon } from '@renderer/assets/icons'
+import { animate, AnimatedDiv } from '@renderer/lib.exports'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
 
@@ -7,11 +8,16 @@ export function Topbar() {
 
   const isWinMaximized = useWindowState((x) => x.isWinMaximized)
   const disableTopbarButtons = useWindowState((x) => x.disableTopbarButtons)
+  const disableButtons = useWindowState((x) => x.disableButtons)
   const setWindowState = useWindowState((x) => x.setWindowState)
 
   return (
     <header id="Topbar" className="laptop-lg:max-h-[4%] laptop-lg:min-h-[4%] max-h-[5%] min-h-[5%] w-full flex-row! items-center bg-[#1c1c1c] pl-4">
-      <p className="mr-auto font-sans text-xs">{t('appTitle')}</p>
+      <p className="mr-2 font-sans text-xs">{t('appTitle')}</p>
+      <AnimatedDiv {...animate({ opacity: true })} condition={disableButtons}>
+        <LoadingIcon className="animate-spin" />
+      </AnimatedDiv>
+      <div className="mr-auto" />
       {import.meta.env.DEV && (
         <>
           <button className="h-full justify-center px-3 duration-200 hover:bg-green-500/50" onClick={async () => await window.api.openUserDataFolder()}>

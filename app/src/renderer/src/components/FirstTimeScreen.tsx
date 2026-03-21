@@ -2,9 +2,12 @@ import { useTranslation } from 'react-i18next'
 import { useFirstTimeScreenState } from './FirstTimeScreen.state'
 import { useUserConfigState } from '@renderer/stores/UserConfig.state'
 import { useWindowState } from '@renderer/stores/Window.state'
-import { animate, AnimatedSection, TransComponent } from '@renderer/lib.exports'
+import { animate, AnimatedButton, AnimatedSection, TransComponent } from '@renderer/lib.exports'
 import clsx from 'clsx'
 import { BRAFlag, MEXFlag, USAFlag } from '@renderer/assets/images'
+import { UserConfigObject } from 'rockshelf-core'
+import { InstrumentScoreData } from 'rbtools'
+import { useLogoScreenState } from './LogoScreen.state'
 
 export function FirstTimeScreen() {
   const { i18n, t } = useTranslation()
@@ -14,12 +17,15 @@ export function FirstTimeScreen() {
   const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
   const disableButtons = useWindowState((x) => x.disableButtons)
   const setWindowState = useWindowState((x) => x.setWindowState)
+  const setFirstTimeScreenState = useFirstTimeScreenState((x) => x.setFirstTimeScreenState)
+  const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
+
   return (
     <AnimatedSection condition={active} {...animate({ opacity: true })} id="FirstTimeScreen" className="absolute! z-3 h-full w-full bg-black/90 p-8 backdrop-blur-lg">
       <div className="mb-2 border-b border-white/25 pb-1">
-        <h1 className="text-[2rem] uppercase font-pentatonicalt!">{t('firstTimeScreenWelcome')}</h1>
+        <h1 className="font-pentatonicalt! text-[2rem] uppercase">{t('firstTimeScreenWelcome')}</h1>
       </div>
-      <p className="mb-4">
+      <p className="mb-8 text-xs">
         <TransComponent i18nKey="firstTimeScreenText" />
       </p>
       <div className="mb-2 flex-row! items-center border-b border-white/25 pb-1">
@@ -38,7 +44,7 @@ export function FirstTimeScreen() {
               setUserConfigState({ devhdd0Path: selectedDevhdd0Path })
               setWindowState({ disableButtons: false })
             } catch (err) {
-              if (err instanceof Error) setWindowState({})
+              if (err instanceof Error) setWindowState({ err })
             }
           }}
           className="rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
@@ -66,7 +72,7 @@ export function FirstTimeScreen() {
               setUserConfigState({ rpcs3ExePath: selectedRPCS3Exe })
               setWindowState({ disableButtons: false })
             } catch (err) {
-              if (err instanceof Error) setWindowState({})
+              if (err instanceof Error) setWindowState({ err })
             }
           }}
           className="rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
@@ -77,6 +83,46 @@ export function FirstTimeScreen() {
       <p className="mb-4 text-xs! text-neutral-600 italic">
         <TransComponent i18nKey="rpcs3ExeDesc" />
       </p>
+      <AnimatedButton
+        condition={Boolean(devhdd0Path) && Boolean(rpcs3ExePath)}
+        disabled={disableButtons}
+        {...animate({ opacity: true, height: true, scaleY: true })}
+        onClick={async () => {
+          setWindowState({ disableButtons: true })
+          try {
+            const save = await window.api.saveUserConfigFile({
+              devhdd0Path,
+              rpcs3ExePath,
+              mostPlayedDifficulty: 3,
+              mostPlayedInstrument: 'band',
+            })
+
+            const rb3Stats = await window.api.rpcs3GetRB3Stats()
+            if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
+            const saveData = await window.api.rpcs3GetSaveDataStats()
+            if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
+
+            let instrumentScores: InstrumentScoreData | false = false
+            if (saveData) instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
+
+            if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+
+            setWindowState({
+              rb3Stats,
+              saveData,
+              instrumentScores,
+              disableButtons: false,
+            })
+            setLogoScreenState({ active: false })
+            setFirstTimeScreenState({ active: false })
+          } catch (err) {
+            if (err instanceof Error) setWindowState({ err })
+          }
+        }}
+        className="w-fit rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+      >
+        {t('continue')}
+      </AnimatedButton>
 
       <div className="mt-auto h-4 w-full flex-row! items-center">
         <h2 className="mr-4 text-xs">{t('changeLang')}</h2>

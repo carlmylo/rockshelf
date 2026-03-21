@@ -1,5 +1,5 @@
-import { getOfficialSongPackageStatsFromHash, type OfficialSongPackageStats, type OfficialSongPackageStatsJSON } from 'rbtools/lib'
-import { getLocaleStringFromRenderer, sendMessage, useHandler } from '../core.exports'
+import { getOfficialSongPackageStatsFromHash, type OfficialSongPackageStats } from 'rbtools/lib'
+import { getLocaleStringFromRenderer, sendSmallMessage, useHandler } from '../core.exports'
 import { PKGFile, type PKGFileJSONRepresentation } from 'rbtools'
 import { dialog } from 'electron'
 import { MyObject, pathLikeToFilePath } from 'node-lib'
@@ -30,14 +30,14 @@ export interface SelectPKGFileReturnObject {
   /**
    * Tells if the selected package is an official package.
    */
-  official: OfficialSongPackageStatsJSON | undefined
+  official?: OfficialSongPackageStats
 }
 
 export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectPKGFileReturnObject | false> => {
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'pkgFile'), extensions: ['pkg'] }] })
 
   if (selection.canceled) {
-    sendMessage(win, {
+    sendSmallMessage(win, {
       type: 'info',
       method: 'selectPKGFileToInstall',
       code: 'actionCancelledByUser',
@@ -51,7 +51,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   try {
     await pkg.checkFileIntegrity()
   } catch (err) {
-    sendMessage(win, {
+    sendSmallMessage(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'invalidFileSignature',
@@ -67,7 +67,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   let dxHash: string | undefined
 
   if (stat.titleID === 'BLUS30050' && !official) {
-    sendMessage(win, {
+    sendSmallMessage(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'rb2PKGNotAllowed',
@@ -83,7 +83,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   }
 
   if (stat.titleID !== 'BLUS30463' && stat.titleID !== 'BLUS30050') {
-    sendMessage(win, {
+    sendSmallMessage(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'notRockBandPKG',

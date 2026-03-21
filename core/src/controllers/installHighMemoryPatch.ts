@@ -1,10 +1,10 @@
 import { isRPCS3Devhdd0PathValid } from 'rbtools/lib'
-import { readUserConfigFile, sendMessage, useHandler } from '../core.exports'
+import { readUserConfigFile, sendSmallMessage, useHandler } from '../core.exports'
 
 export const installHighMemoryPatch = useHandler(async (win, _): Promise<boolean> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {
-    sendMessage(win, { method: 'installHighMemoryPatch', type: 'error', code: 'noUserConfigFile' })
+    sendSmallMessage(win, { method: 'installHighMemoryPatch', type: 'error', code: 'noUserConfigFile' })
     return false
   }
 
@@ -12,6 +12,6 @@ export const installHighMemoryPatch = useHandler(async (win, _): Promise<boolean
   if (!usrdir.exists) await usrdir.mkDir(true)
   const highMemoryDTAFile = usrdir.gotoFile('dx_high_memory.dta')
   await highMemoryDTAFile.write('(dx_high_memory 190000000)\n(dx_song_count 16000)\n')
-  sendMessage(win, { type: 'success', method: 'installHighMemoryPatch', code: '' })
+  sendSmallMessage(win, { type: 'success', method: 'installHighMemoryPatch', code: '' })
   return true
 })

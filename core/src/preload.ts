@@ -1,25 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { ipcRenderer, shell, webUtils, type IpcRenderer, type IpcRendererEvent } from 'electron'
 import type { Promisable } from 'type-fest'
-import type { openUserDataFolder, readUserConfigFile, RendererMessageObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize } from './core.exports'
-import type { installHighMemoryPatch, installPKGFile, rpcs3GetInstrumentScores, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe } from './controllers.exports'
+import type { openUserDataFolder, readUserConfigFile, SmallMessageObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize } from './core.exports'
+import type { deleteUserConfigAndRestart, installHighMemoryPatch, installPKGFile, rpcs3GetInstrumentScores, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
 import type { ParsedRB3SaveData } from 'rbtools'
 
 const invoke = ipcRenderer.invoke.bind(ipcRenderer)
 const on = ipcRenderer.on.bind(ipcRenderer)
 
-export type OnMessageCallback = (event: IpcRendererEvent, message: RendererMessageObject) => Promisable<any>
+export type OnSmallMessageCallback = (event: IpcRendererEvent, message: SmallMessageObject) => Promisable<any>
+export type OnDialogScreenCallback = (event: IpcRendererEvent, code: string) => Promisable<any>
 export type OnLocaleRequestCallback = (event: IpcRendererEvent, uuid: string, key: string) => void
 
 export const rockshelfAPI = {
   /**
-   * Listens for messages from the main process.
+   * Listens for small messages from the main process.
    * - - - -
    * @param {OnMessageCallback} callback The callback function to handle the message event.
    * @returns {IpcRenderer}
    */
-  onMessage(callback: OnMessageCallback): IpcRenderer {
-    return on('sendMessage', callback)
+  onSmallMessage(callback: OnSmallMessageCallback): IpcRenderer {
+    return on('sendSmallMessage', callback)
+  },
+  onDialog(callback: OnDialogScreenCallback): IpcRenderer {
+    return on('sendDialog', callback)
   },
   /**
    * Listens for requests to localized values.
@@ -99,4 +103,6 @@ export const rockshelfAPI = {
   selectPKGFileToInstall: async (): ReturnType<typeof selectPKGFileToInstall> => await invoke('selectPKGFileToInstall'),
   installHighMemoryPatch: async (): ReturnType<typeof installHighMemoryPatch> => await invoke('installHighMemoryPatch'),
   installPKGFile: async (selectedPKG: SelectPKGFileReturnObject): ReturnType<typeof installPKGFile> => await invoke('installPKGFile', selectedPKG),
+  testUserConfig: async (): ReturnType<typeof testUserConfig> => await invoke('testUserConfig'),
+  deleteUserConfigAndRestart: async (): ReturnType<typeof deleteUserConfigAndRestart> => await invoke('deleteUserConfigAndRestart'),
 } as const

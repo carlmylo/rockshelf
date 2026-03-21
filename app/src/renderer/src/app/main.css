@@ -100,7 +100,7 @@ button {
   @apply font-pentatonic;
 }
 
-#TopBar {
+#Topbar {
   @apply font-sans text-xs;
   -webkit-app-region: drag;
 

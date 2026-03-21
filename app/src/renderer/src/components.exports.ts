@@ -1,4 +1,7 @@
+export * from './components/DialogScreen'
 export * from './components/FirstTimeScreen'
 export * from './components/LogoScreen'
+export * from './components/MainScreen'
+export * from './components/SmallMessage'
 export * from './components/Topbar'
 export * from './components/WindowFrame'

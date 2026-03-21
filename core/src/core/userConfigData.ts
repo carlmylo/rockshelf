@@ -1,7 +1,7 @@
 import type { ScoreDataInstrumentTypes } from 'rbtools'
 import { BrowserWindow, shell } from 'electron'
 import { getRockshelfUserDataDir, getUserConfigFile } from './fs'
-import { sendMessage } from './sendMessage'
+import { sendSmallMessage } from './sendMessage'
 
 export interface UserConfigObject {
   /**
@@ -32,7 +32,7 @@ export const openUserDataFolder = async (win: BrowserWindow): Promise<boolean> =
   const rockshelfUserDataDir = getRockshelfUserDataDir()
   const error = await shell.openPath(rockshelfUserDataDir.path)
   if (error) {
-    sendMessage(win, { type: 'error', method:'openUserDataFolder', code: 'openUserDataError' })
+    sendSmallMessage(win, { type: 'error', method: 'openUserDataFolder', code: 'openUserDataError' })
     return false
   }
   return true
@@ -62,4 +62,9 @@ export const saveUserConfigFile = async (newConfig: Partial<UserConfigObject>): 
 
   await userConfigFilePath.write(JSON.stringify(value))
   return userConfigFilePath.path
+}
+
+export const deleteUserConfigFile = async () => {
+  const userConfigFile = getUserConfigFile()
+  if (userConfigFile.exists) await userConfigFile.delete()
 }

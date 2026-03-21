@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 export interface LogoScreenStateProps {
   active: boolean
+  showText: boolean
 }
 
 export interface LogoScreenStateActions {
@@ -27,6 +28,7 @@ export type LogoScreenStateHook = LogoScreenStateProps & LogoScreenStateActions
 
 const defaultState: LogoScreenStateProps = {
   active: true,
+  showText: false,
 }
 
 export const useLogoScreenState = create<LogoScreenStateHook>()((set, get) => ({

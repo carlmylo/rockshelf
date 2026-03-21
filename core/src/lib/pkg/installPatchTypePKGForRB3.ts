@@ -2,9 +2,10 @@ import { BinaryAPI } from 'rbtools'
 import type { SelectPKGFileReturnObject } from '../../controllers.exports'
 import { temporaryDirectory } from 'tempy'
 import { DirPath, pathLikeToDirPath, type DirPathLikeTypes } from 'node-lib'
+import { getRB3USRDIR } from '../../core.exports'
 
-export const installPatchTypePKG = async (rb3GameFolderPath: DirPathLikeTypes, selectedPKG: SelectPKGFileReturnObject): Promise<boolean> => {
-  const rb3GameFolder = pathLikeToDirPath(rb3GameFolderPath)
+export const installPatchTypePKGForRB3 = async (devhdd0Path: DirPathLikeTypes, selectedPKG: SelectPKGFileReturnObject): Promise<boolean> => {
+  const rb3GameFolder = getRB3USRDIR(devhdd0Path).gotoDir('../')
   const tempFolderPath = await BinaryAPI.ps3pPKGRipper(selectedPKG.pkgPath, temporaryDirectory())
 
   for (const entry of await tempFolderPath.readDir(true)) {
@@ -19,6 +20,6 @@ export const installPatchTypePKG = async (rb3GameFolderPath: DirPathLikeTypes, s
     await entry.move(newFilePath, true)
   }
 
-  await tempFolderPath.deleteDir(true)
+  await tempFolderPath.deleteDir()
   return true
 }
