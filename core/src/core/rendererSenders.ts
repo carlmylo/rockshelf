@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 
-export interface SmallMessageObject {
+export interface MessageBoxObject {
   /**
    * The type of the message.
    *
@@ -34,8 +34,8 @@ export interface SmallMessageObject {
  * @param {MessagePopUpOptions} options Message configuration payload.
  * @returns {true} Always returns true after dispatching the message.
  */
-export const sendSmallMessage = (win: BrowserWindow, options: SmallMessageObject): true => {
-  win.webContents.send('sendSmallMessage', options)
+export const sendMessageBox = (win: BrowserWindow, options: MessageBoxObject): true => {
+  win.webContents.send('sendMessageBox', options)
   return true
 }
 

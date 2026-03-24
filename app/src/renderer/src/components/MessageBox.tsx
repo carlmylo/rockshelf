@@ -1,33 +1,44 @@
-import { animate, AnimatedSection, mountSmallMessageLocaleKey, TransComponent } from '@renderer/lib.exports'
-import { useSmallMessageState } from './SmallMessage.state'
+import { animate, AnimatedSection, mountMessageBoxLocaleKey, TransComponent } from '@renderer/lib.exports'
+import { useMessageBoxState } from './MessageBox.state'
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorIcon, LoadingIcon, SuccessIcon } from '@renderer/assets/icons'
 import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 
-export function SmallMessage() {
+export function MessageBox() {
   const { t } = useTranslation()
-  const message = useSmallMessageState((x) => x.message)
-  const setSmallMessageState = useSmallMessageState((x) => x.setSmallMessageState)
+  const message = useMessageBoxState((x) => x.message)
+  const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const active = useMemo(() => message !== null, [message])
-  const timeout = useSmallMessageState((x) => x.timeout)
+  const timeout = useMessageBoxState((x) => x.timeout)
 
-  const i18nKey = useMemo(() => mountSmallMessageLocaleKey(message), [message])
+  const i18nKey = useMemo(() => mountMessageBoxLocaleKey(message), [message])
 
   useEffect(
     function SetNewActiveTimeout() {
       if (timeout !== null) clearTimeout(timeout)
       if (message) {
         if (message.type !== 'loading' && message.type !== 'debug') {
-          const newTimeout = setTimeout(() => setSmallMessageState({ message: null }), message.timeout || 4000)
-          setSmallMessageState({ timeout: newTimeout })
+          const newTimeout = setTimeout(() => setMessageBoxState({ message: null }), message.timeout || 4000)
+          setMessageBoxState({ timeout: newTimeout })
         }
       }
     },
     [message]
   )
   return (
-    <AnimatedSection id="SmallMessage" condition={active} {...animate({ opacity: true })} className={clsx('absolute! top-3 right-3 z-50 ml-auto w-[30%] max-w-[30%] flex-row! items-start border bg-black/90 p-2 backdrop-blur-md', message && message.type === 'warn' ? 'border-yellow-500' : message && message.type === 'error' ? 'border-red-500' : message && message.type === 'success' ? 'border-green-500' : '')}>
+    <AnimatedSection
+      id="Message"
+      condition={active}
+      {...animate({ opacity: true })}
+      className={clsx('absolute! top-3 right-3 z-50 ml-auto w-[30%] max-w-[30%] flex-row! items-start border bg-black/90 p-2 backdrop-blur-md', message && message.type === 'warn' ? 'border-yellow-500' : message && message.type === 'error' ? 'border-red-500' : message && message.type === 'success' ? 'border-green-500' : '')}
+      onClick={() => {
+        if (message && message.type !== 'loading' && message.type !== 'debug' && timeout !== null) {
+          clearTimeout(timeout)
+          setMessageBoxState({ message: null })
+        }
+      }}
+    >
       {message && (
         <div className="w-full flex-row! items-start">
           {message.type === 'loading' && <LoadingIcon className="mt-0.5 mr-2 min-w-8 animate-spin text-lg" />}

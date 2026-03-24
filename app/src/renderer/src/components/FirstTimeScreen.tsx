@@ -6,7 +6,7 @@ import { animate, AnimatedButton, AnimatedSection, TransComponent } from '@rende
 import clsx from 'clsx'
 import { BRAFlag, MEXFlag, USAFlag } from '@renderer/assets/images'
 import { UserConfigObject } from 'rockshelf-core'
-import { InstrumentScoreData } from 'rbtools'
+import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './LogoScreen.state'
 
 export function FirstTimeScreen() {
@@ -96,16 +96,20 @@ export function FirstTimeScreen() {
               mostPlayedDifficulty: 3,
               mostPlayedInstrument: 'band',
             })
+            
 
             const rb3Stats = await window.api.rpcs3GetRB3Stats()
             if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
-            const saveData = await window.api.rpcs3GetSaveDataStats()
-            if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
-
+            let saveData: ParsedRB3SaveData | false = false
             let instrumentScores: InstrumentScoreData | false = false
-            if (saveData) instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
-
-            if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+            if (typeof rb3Stats === 'object' && rb3Stats.hasSaveData) {
+              saveData = await window.api.rpcs3GetSaveDataStats()
+              if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
+              if (saveData) {
+                instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+              }
+            }
 
             setWindowState({
               rb3Stats,

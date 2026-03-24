@@ -1,10 +1,10 @@
 import { rpcs3GetRB3Stats as getStats, isRPCS3Devhdd0PathValid, isRPCS3ExePathValid, type RockBand3Data } from 'rbtools/lib'
-import { readUserConfigFile, sendSmallMessage, useHandler } from '../core.exports'
+import { readUserConfigFile, sendMessageBox, useHandler } from '../core.exports'
 
 export const rpcs3GetRB3Stats = useHandler(async (win, __): Promise<false | RockBand3Data> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {
-    sendSmallMessage(win, { method: 'getRPCS3Stats', type: 'error', code: 'noUserConfigFile' })
+    sendMessageBox(win, { method: 'getRPCS3Stats', type: 'error', code: 'noUserConfigFile' })
     return false
   }
 

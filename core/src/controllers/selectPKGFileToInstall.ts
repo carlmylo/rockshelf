@@ -1,5 +1,5 @@
 import { getOfficialSongPackageStatsFromHash, type OfficialSongPackageStats } from 'rbtools/lib'
-import { getLocaleStringFromRenderer, sendSmallMessage, useHandler } from '../core.exports'
+import { getLocaleStringFromRenderer, sendMessageBox, useHandler } from '../core.exports'
 import { PKGFile, type PKGFileJSONRepresentation } from 'rbtools'
 import { dialog } from 'electron'
 import { MyObject, pathLikeToFilePath } from 'node-lib'
@@ -37,7 +37,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'pkgFile'), extensions: ['pkg'] }] })
 
   if (selection.canceled) {
-    sendSmallMessage(win, {
+    sendMessageBox(win, {
       type: 'info',
       method: 'selectPKGFileToInstall',
       code: 'actionCancelledByUser',
@@ -51,7 +51,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   try {
     await pkg.checkFileIntegrity()
   } catch (err) {
-    sendSmallMessage(win, {
+    sendMessageBox(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'invalidFileSignature',
@@ -67,7 +67,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   let dxHash: string | undefined
 
   if (stat.titleID === 'BLUS30050' && !official) {
-    sendSmallMessage(win, {
+    sendMessageBox(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'rb2PKGNotAllowed',
@@ -83,7 +83,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   }
 
   if (stat.titleID !== 'BLUS30463' && stat.titleID !== 'BLUS30050') {
-    sendSmallMessage(win, {
+    sendMessageBox(win, {
       type: 'error',
       method: 'selectPKGFileToInstall',
       code: 'notRockBandPKG',

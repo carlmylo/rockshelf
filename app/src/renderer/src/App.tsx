@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
-import { DialogScreen, FirstTimeScreen, LogoScreen, MainScreen, SmallMessage, Topbar, WindowFrame } from './components.exports'
+import { DeluxeInstallScreen, DialogScreen, FirstTimeScreen, LogoScreen, MainScreen, MessageBox, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
 import { useUserConfigState } from './stores/UserConfig.state'
-import { InstrumentScoreData } from 'rbtools'
+import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './components/LogoScreen.state'
-import { useSmallMessageState } from './components/SmallMessage.state'
+import { useMessageBoxState } from './components/MessageBox.state'
 import { useDialogScreenState } from './components/DialogScreen.state'
 
 export function App() {
@@ -15,7 +15,7 @@ export function App() {
   const setFirstTimeScreenState = useFirstTimeScreenState((x) => x.setFirstTimeScreenState)
   const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
   const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
-  const setSmallMessageState = useSmallMessageState((x) => x.setSmallMessageState)
+  const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const setDialogScreenState = useDialogScreenState((x) => x.setDialogScreenState)
 
   useEffect(function initApp() {
@@ -41,12 +41,16 @@ export function App() {
         const rb3Stats = await window.api.rpcs3GetRB3Stats()
         if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
 
-        const saveData = await window.api.rpcs3GetSaveDataStats()
-        if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
-
+        let saveData: ParsedRB3SaveData | false = false
         let instrumentScores: InstrumentScoreData | false = false
-        if (saveData) instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
-        if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+        if (typeof rb3Stats === 'object' && rb3Stats.hasSaveData) {
+          saveData = await window.api.rpcs3GetSaveDataStats()
+          if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
+          if (saveData) {
+            instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
+            if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+          }
+        }
 
         setWindowState({
           rb3Stats,
@@ -78,8 +82,8 @@ export function App() {
     })
   })
 
-  useEffect(function initSmallMessageListener() {
-    window.api.onSmallMessage((_, message) => setSmallMessageState({ message }))
+  useEffect(function initMessageListener() {
+    window.api.onMessage((_, message) => setMessageBoxState({ message }))
   })
 
   useEffect(function initDialogListener() {
@@ -89,12 +93,12 @@ export function App() {
     <>
       <Topbar />
       <WindowFrame>
-        <LogoScreen />
-        <FirstTimeScreen />
-        <MainScreen />
-
         <DialogScreen />
-        <SmallMessage />
+        <FirstTimeScreen />
+        <LogoScreen />
+        <MainScreen />
+        <MessageBox />
+        <DeluxeInstallScreen />
       </WindowFrame>
     </>
   )

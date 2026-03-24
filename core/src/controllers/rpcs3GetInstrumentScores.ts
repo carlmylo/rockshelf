@@ -1,10 +1,10 @@
-import { readUserConfigFile, sendSmallMessage, useHandler } from '../core.exports'
+import { readUserConfigFile, sendMessageBox, useHandler } from '../core.exports'
 import { RB3SaveData, type InstrumentScoreData, type ParsedRB3SaveData } from 'rbtools'
 
 export const rpcs3GetInstrumentScores = useHandler(async (win, __, saveData: ParsedRB3SaveData): Promise<false | InstrumentScoreData> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {
-    sendSmallMessage(win, { method: 'getRPCS3Stats', type: 'error', code: 'noUserConfigFile' })
+    sendMessageBox(win, { method: 'getRPCS3Stats', type: 'error', code: 'noUserConfigFile' })
     return false
   }
 

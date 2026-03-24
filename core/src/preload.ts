@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { ipcRenderer, shell, webUtils, type IpcRenderer, type IpcRendererEvent } from 'electron'
 import type { Promisable } from 'type-fest'
-import type { openUserDataFolder, readUserConfigFile, SmallMessageObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize } from './core.exports'
+import type { openUserDataFolder, readUserConfigFile, MessageBoxObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize } from './core.exports'
 import type { deleteUserConfigAndRestart, installHighMemoryPatch, installPKGFile, rpcs3GetInstrumentScores, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
 import type { ParsedRB3SaveData } from 'rbtools'
 
 const invoke = ipcRenderer.invoke.bind(ipcRenderer)
 const on = ipcRenderer.on.bind(ipcRenderer)
 
-export type OnSmallMessageCallback = (event: IpcRendererEvent, message: SmallMessageObject) => Promisable<any>
+export type OnMessageCallback = (event: IpcRendererEvent, message: MessageBoxObject) => Promisable<any>
 export type OnDialogScreenCallback = (event: IpcRendererEvent, code: string) => Promisable<any>
 export type OnLocaleRequestCallback = (event: IpcRendererEvent, uuid: string, key: string) => void
 
@@ -19,8 +19,8 @@ export const rockshelfAPI = {
    * @param {OnMessageCallback} callback The callback function to handle the message event.
    * @returns {IpcRenderer}
    */
-  onSmallMessage(callback: OnSmallMessageCallback): IpcRenderer {
-    return on('sendSmallMessage', callback)
+  onMessage(callback: OnMessageCallback): IpcRenderer {
+    return on('sendMessageBox', callback)
   },
   onDialog(callback: OnDialogScreenCallback): IpcRenderer {
     return on('sendDialog', callback)
@@ -92,17 +92,18 @@ export const rockshelfAPI = {
    * @returns {Promise<boolean>}
    */
   windowMaximize: async (): Promise<ReturnType<typeof windowMaximize>> => await invoke('windowMaximize'),
-  openUserDataFolder: async (): ReturnType<typeof openUserDataFolder> => await invoke('openUserDataFolder'),
-  readUserConfigFile: async (): ReturnType<typeof readUserConfigFile> => await invoke('readUserConfigFile'),
-  saveUserConfigFile: async (newConfig: Partial<UserConfigObject>): ReturnType<typeof saveUserConfigFile> => await invoke('saveUserConfigFile', newConfig),
-  selectDevhdd0Dir: async (): ReturnType<typeof selectDevhdd0Dir> => await invoke('selectDevhdd0Dir'),
-  selectRPCS3Exe: async (): ReturnType<typeof selectRPCS3Exe> => await invoke('selectRPCS3Exe'),
-  rpcs3GetRB3Stats: async (): ReturnType<typeof rpcs3GetRB3Stats> => await invoke('rpcs3GetRB3Stats'),
-  rpcs3GetSaveDataStats: async (): ReturnType<typeof rpcs3GetSaveDataStats> => await invoke('rpcs3GetSaveDataStats'),
-  rpcs3GetInstrumentScores: async (saveData: ParsedRB3SaveData): ReturnType<typeof rpcs3GetInstrumentScores> => await invoke('rpcs3GetInstrumentScores', saveData),
-  selectPKGFileToInstall: async (): ReturnType<typeof selectPKGFileToInstall> => await invoke('selectPKGFileToInstall'),
+
+  deleteUserConfigAndRestart: async (): ReturnType<typeof deleteUserConfigAndRestart> => await invoke('deleteUserConfigAndRestart'),
   installHighMemoryPatch: async (): ReturnType<typeof installHighMemoryPatch> => await invoke('installHighMemoryPatch'),
   installPKGFile: async (selectedPKG: SelectPKGFileReturnObject): ReturnType<typeof installPKGFile> => await invoke('installPKGFile', selectedPKG),
+  openUserDataFolder: async (): ReturnType<typeof openUserDataFolder> => await invoke('openUserDataFolder'),
+  readUserConfigFile: async (): ReturnType<typeof readUserConfigFile> => await invoke('readUserConfigFile'),
+  rpcs3GetInstrumentScores: async (saveData: ParsedRB3SaveData): ReturnType<typeof rpcs3GetInstrumentScores> => await invoke('rpcs3GetInstrumentScores', saveData),
+  rpcs3GetRB3Stats: async (): ReturnType<typeof rpcs3GetRB3Stats> => await invoke('rpcs3GetRB3Stats'),
+  rpcs3GetSaveDataStats: async (): ReturnType<typeof rpcs3GetSaveDataStats> => await invoke('rpcs3GetSaveDataStats'),
+  saveUserConfigFile: async (newConfig: Partial<UserConfigObject>): ReturnType<typeof saveUserConfigFile> => await invoke('saveUserConfigFile', newConfig),
+  selectDevhdd0Dir: async (): ReturnType<typeof selectDevhdd0Dir> => await invoke('selectDevhdd0Dir'),
+  selectPKGFileToInstall: async (): ReturnType<typeof selectPKGFileToInstall> => await invoke('selectPKGFileToInstall'),
+  selectRPCS3Exe: async (): ReturnType<typeof selectRPCS3Exe> => await invoke('selectRPCS3Exe'),
   testUserConfig: async (): ReturnType<typeof testUserConfig> => await invoke('testUserConfig'),
-  deleteUserConfigAndRestart: async (): ReturnType<typeof deleteUserConfigAndRestart> => await invoke('deleteUserConfigAndRestart'),
 } as const
