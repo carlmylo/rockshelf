@@ -21,8 +21,10 @@ export function DeluxeInstallScreen() {
   const setWindowState = useWindowState((x) => x.setWindowState)
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const disableButtons = useWindowState((x) => x.disableButtons)
+  const rb3Stats = useWindowState((x) => x.rb3Stats)
 
   const mustFetchCommitData = useMemo(() => selectedPKG !== null && selectedPKG !== 'loading', [selectedPKG])
+  const selDXVerEqualFromInstalledDXVer = useMemo(() => typeof rb3Stats === 'object' && typeof selectedPKG === 'object' && selectedPKG !== null && rb3Stats.deluxeVersionHash === selectedPKG.dxHash, [rb3Stats, selectedPKG])
 
   useEffect(() => {
     const start = async () => {
@@ -30,7 +32,7 @@ export function DeluxeInstallScreen() {
         setDeluxeInstallScreenState({ commitData: 'loading' })
         try {
           const { data } = await axios.get<GitHubCommitResponse>(`https://api.github.com/repos/hmxmilohax/rock-band-3-deluxe/commits/${selectedPKG.dxHash}`, { responseType: 'json', timeout: 6000 })
-          if (import.meta.env.DEV) console.log('struct GitHubCommitResponse ["app\\src\\renderer\\src\\app\\types.ts"]:', commitData)
+          if (import.meta.env.DEV) console.log('struct GitHubCommitResponse ["app\\src\\renderer\\src\\app\\types.ts"]:', data)
           setDeluxeInstallScreenState({ commitData: data })
         } catch (err) {
           if (err instanceof AxiosError || err instanceof Error) setWindowState({ err })
@@ -137,7 +139,7 @@ export function DeluxeInstallScreen() {
                   setWindowState({ disableButtons: false })
                 }}
               >
-                {t('installDeluxe')}
+                {selDXVerEqualFromInstalledDXVer ? t('reinstallDeluxe') : t('installDeluxe')}
               </button>
             </div>
             <div className="w-full">
@@ -166,15 +168,25 @@ export function DeluxeInstallScreen() {
                     {aheadCommitData !== null && aheadCommitData !== 'loading' && (
                       <>
                         {aheadCommitData.status === 'identical' && <p className="text-green-500 italic">{t('updatedRB3DXInfo')}</p>}
-                        {aheadCommitData.status === 'behind' && <p className="text-yellow-500 italic">{t(aheadCommitData.behind_by === 1 ? 'notUpdatedRB3DXInfo' : 'notUpdatedRB3DXInfoPlural', { behindBy: aheadCommitData.behind_by })}</p>}
+                        {aheadCommitData.status === 'behind' && <p className="text-cyan-500 italic">{t(aheadCommitData.behind_by === 1 ? 'notUpdatedRB3DXInfo' : 'notUpdatedRB3DXInfoPlural', { behindBy: aheadCommitData.behind_by })}</p>}
+                        {selDXVerEqualFromInstalledDXVer && <p className="text-xs text-yellow-500 italic">{t('selDXVerEqualFromInstalledDxVer')}</p>}
                         <div className="h-4 w-full" />
                       </>
                     )}
                     <div className="mt-2 flex-row!">
-                      <img src={commitData.author?.avatar_url} className="mr-2 w-14" />
+                      <img src={commitData.author?.avatar_url} className="mr-2 w-16" />
                       <div>
                         <h2 className="text-xs font-bold uppercase">{t('commitBy')}</h2>
-                        <h3 className="text-base">{commitData.author!.login}</h3>
+                        <h3 className="mb-2 text-base">{commitData.author!.login}</h3>
+                        <button
+                          disabled={disableButtons}
+                          className="w-fit rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! whitespace-nowrap uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                          onClick={async () => {
+                            await window.api.openExternalLink(commitData.html_url)
+                          }}
+                        >
+                          {t('openCommitOnGitHub')}
+                        </button>
                       </div>
                     </div>
                   </>

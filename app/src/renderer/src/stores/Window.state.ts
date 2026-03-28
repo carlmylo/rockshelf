@@ -19,6 +19,7 @@ export interface WindowStateProps {
   rb3Stats: false | RockBand3Data | 'loading'
   saveData: false | ParsedRB3SaveData | 'loading'
   instrumentScores: false | InstrumentScoreData | 'loading'
+  packages: unknown
 }
 
 export interface WindowStateActions {
@@ -50,6 +51,7 @@ const defaultState: WindowStateProps = {
   rb3Stats: false,
   instrumentScores: false,
   saveData: false,
+  packages: null,
 }
 
 export const useWindowState = create<WindowStateHook>()((set, get) => ({

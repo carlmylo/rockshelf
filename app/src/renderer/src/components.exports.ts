@@ -1,4 +1,6 @@
 export * from './components/BuzyLoadScreen'
+export * from './components/ConfigScreen'
+export * from './components/CreateNewPackageScreen'
 export * from './components/DeluxeInstallScreen'
 export * from './components/DialogScreen'
 export * from './components/FirstTimeScreen'

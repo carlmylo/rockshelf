@@ -8,18 +8,23 @@ import type { ParsedRB3SaveData, InstrumentScoreData } from 'rbtools'
 import { DXNIGHTLYLINK, TU5LINK } from '@renderer/app/rockshelf'
 import { RockBand3Data } from 'rbtools/lib'
 import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
+import { useMessageBoxState } from './MessageBox.state'
+import { useConfigScreenState } from './ConfigScreen.state'
 
 export function MainScreen() {
   const { t } = useTranslation()
   const active = useMainScreenState((x) => x.active)
   const rb3Stats = useWindowState((x) => x.rb3Stats)
   const saveData = useWindowState((x) => x.saveData)
+  const packages = useWindowState((x) => x.packages)
   const disableButtons = useWindowState((x) => x.disableButtons)
   const setWindowState = useWindowState((x) => x.setWindowState)
+  const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const setDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.setDeluxeInstallScreenState)
+  const setConfigScreenState = useConfigScreenState((x) => x.setConfigScreenState)
 
   return (
-    <AnimatedSection id="MainScreen" condition={active} className="h-full max-h-full w-full max-w-full overflow-y-hidden p-8">
+    <AnimatedSection id="MainScreen" condition={active} className="z-0 h-full max-h-full w-full max-w-full overflow-y-hidden p-8">
       <div className="h-full max-h-full w-full max-w-full overflow-y-auto">
         <div className="mb-4 h-12 w-full flex-row! items-center rounded-sm border border-neutral-900 bg-neutral-800 px-3 py-2">
           {typeof rb3Stats === 'object' && rb3Stats.userName && rb3Stats.hasSaveData && (
@@ -76,12 +81,33 @@ export function MainScreen() {
               <div className="mr-4 h-48 max-h-48 w-48 max-w-48">
                 <img src={`rbicons://${rb3Stats.hasDeluxe ? 'dx' : 'rb3'}`} className={clsx(!rb3Stats.hasGameInstalled && 'grayscale', 'mr-4 mb-2 h-48 min-h-48 w-48 min-w-48 duration-200')} />
                 <button
-                  className="w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
                   onClick={async () => {
                     setDeluxeInstallScreenState({ active: true })
                   }}
                 >
                   {t('installDeluxe')}
+                </button>
+                <button
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  onClick={async () => {
+                    setWindowState({ disableButtons: true })
+                    // if (!packages) {
+                    // }
+                    setWindowState({ disableButtons: false })
+                  }}
+                >
+                  {t('createNewPackage')}
+                </button>
+                <button
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  onClick={async () => {
+                    setWindowState({ disableButtons: true })
+                    setConfigScreenState({ active: true })
+                    setWindowState({ disableButtons: false })
+                  }}
+                >
+                  {t('configurations')}
                 </button>
               </div>
               <div className="w-full">
@@ -135,6 +161,7 @@ export function MainScreen() {
                                     })
                                     setWindowState({ disableButtons: false })
                                   } catch (err) {
+                                    console.log(err)
                                     if (err instanceof Error) setWindowState({ err })
                                   }
                                 }}
@@ -156,68 +183,6 @@ export function MainScreen() {
             </>
           )}
         </AnimatedDiv>
-        {/* <div className="mb-4 h-8 w-full flex-row! items-center rounded-sm bg-neutral-800 px-3">
-          {typeof rb3Stats === 'object' && !rb3Stats.hasGameInstalled && saveData && <p className="text-neutral-400 italic">{t('noSaveDataFound')}</p>}
-          <button
-            className="ml-auto w-fit rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-            disabled={disableButtons}
-            onClick={() =>
-              errorHandler(async () => {
-                setWindowState({ disableButtons: true, rb3Stats: 'loading' })
-                const newRB3Stats = await window.api.rpcs3GetRB3Stats()
-                setWindowState({ disableButtons: false, rb3Stats: newRB3Stats })
-              })
-            }
-          >
-            {t('refresh')}
-          </button>
-        </div>
-        <div className="flex-row!">
-          <img src={`rbicons://${typeof rb3Stats === 'object' && rb3Stats.hasDeluxe ? 'dx' : 'rb3'}`} className={clsx(typeof rb3Stats === 'object' && !rb3Stats.hasGameInstalled && 'grayscale', 'mr-4 h-48 min-h-48 w-48 min-w-48')} />
-          <div>
-            {typeof rb3Stats === 'object' && !rb3Stats.hasGameInstalled && (
-              <>
-                <h1 className="uppercase">{t('status')}</h1>
-                <h2 className="mb-4 font-bold">{t('notInstalled')}</h2>
-                <p className="mb-2 text-xs text-neutral-600 italic">
-                  <TransComponent i18nKey="noRB3FoundInstalled" />
-                </p>
-                <button
-                  disabled={disableButtons}
-                  onClick={async () => {
-                    setWindowState({ rb3Stats: 'loading', disableButtons: true })
-                    try {
-                      const newRB3Stats = await window.api.rpcs3GetRB3Stats()
-                      if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', newRB3Stats)
-                      setWindowState({ rb3Stats: newRB3Stats, disableButtons: false })
-                    } catch (err) {
-                      if (err instanceof Error) setWindowState({ err: err })
-                    }
-                  }}
-                  className="w-fit rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                >
-                  {t('refresh')}
-                </button>
-              </>
-            )}
-            {rb3Stats === 'loading' && (
-              <div className="flex-row! items-center">
-                <LoadingIcon className="mr-2 animate-spin" />
-                <p>{t('refreshingData')}</p>
-              </div>
-            )}
-            {typeof rb3Stats === 'object' && rb3Stats.hasGameInstalled && (
-              <>
-                <h1 className="mb-0.5 text-xs text-gray-400 uppercase">{t('gameSerial')}</h1>
-                <p className="mb-2">{rb3Stats.gameSerial}</p>
-                <h1 className="mb-0.5 text-xs text-gray-400 uppercase">{t('status')}</h1>
-                <p className="mb-4">{t('installed')}</p>
-                <h1 className="mb-0.5 text-xs text-gray-400 uppercase">{t('patchVersion')}</h1>
-                <p className="mb-4">{rb3Stats.updateType === 'none' ? t('noPatchInstalled') : rb3Stats.updateType === 'tu5' ? t('tu5') : t('dx')}</p>
-              </>
-            )}
-          </div>
-        </div> */}
       </div>
     </AnimatedSection>
   )

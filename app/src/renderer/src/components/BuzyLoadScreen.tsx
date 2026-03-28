@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CheckedCircleIcon, LoadingIcon } from '@renderer/assets/icons'
 import { useWindowState } from '@renderer/stores/Window.state'
+import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
 
 export function BuzyLoadScreen() {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ export function BuzyLoadScreen() {
   const setBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.setBuzyLoadScreenState)
   const resetBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.resetBuzyLoadScreenState)
   const setWindowState = useWindowState((x) => x.setWindowState)
+  const resetDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.resetDeluxeInstallScreenState)
 
   const condition = useMemo(() => active !== null, [active])
 
@@ -51,6 +53,11 @@ export function BuzyLoadScreen() {
                       const rb3Stats = await window.api.rpcs3GetRB3Stats()
                       if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
                       setWindowState({ rb3Stats })
+                      break
+                    }
+                    case 'resetDeluxeInstallScreenState': {
+                      resetDeluxeInstallScreenState()
+                      break
                     }
                   }
                 }

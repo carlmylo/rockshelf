@@ -1,11 +1,11 @@
 import { RB3SaveData, type ParsedRB3SaveData } from 'rbtools'
-import { getRB3SaveDataFile, readUserConfigFile, sendMessageBox, useHandler } from '../core.exports'
+import { getRB3SaveDataFile, readUserConfigFile, sendDialog, useHandler } from '../core.exports'
 import { isRPCS3Devhdd0PathValid } from 'rbtools/lib'
 
 export const rpcs3GetSaveDataStats = useHandler(async (win, __): Promise<false | ParsedRB3SaveData> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {
-    sendMessageBox(win, { method: 'rpcs3GetSaveDataStats', type: 'error', code: 'noUserConfigFile' })
+    sendDialog(win, 'corruptedUserConfig')
     return false
   }
 

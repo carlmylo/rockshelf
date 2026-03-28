@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BuzyLoadScreen, DeluxeInstallScreen, DialogScreen, FirstTimeScreen, LogoScreen, MainScreen, MessageBox, Topbar, WindowFrame } from './components.exports'
+import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FirstTimeScreen, LogoScreen, MainScreen, MessageBox, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
@@ -116,12 +116,14 @@ export function App() {
       <Topbar />
       <WindowFrame>
         <BuzyLoadScreen />
+        <ConfigScreen />
+        <CreateNewPackageScreen />
+        <DeluxeInstallScreen />
         <DialogScreen />
         <FirstTimeScreen />
         <LogoScreen />
         <MainScreen />
         <MessageBox />
-        <DeluxeInstallScreen />
       </WindowFrame>
     </>
   )

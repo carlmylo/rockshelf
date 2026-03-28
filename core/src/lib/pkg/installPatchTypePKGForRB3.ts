@@ -6,7 +6,7 @@ import { getRB3USRDIR, sendBuzyLoad } from '../../core.exports'
 import type { BrowserWindow } from 'electron'
 
 export const installPatchTypePKGForRB3 = async (win: BrowserWindow, devhdd0Path: DirPathLikeTypes, selectedPKG: SelectPKGFileReturnObject): Promise<boolean> => {
-  sendBuzyLoad(win, { code: 'init', title: selectedPKG.pkgType === 'dx' ? 'installingRB3DX' : 'installingTU5', steps: selectedPKG.pkgType === 'dx' ? ['extractingDeluxePKG', 'installingRB3DX'] : ['extractingTU5PKG', 'installingTU5'], onCompleted: ['refreshRB3Stats'] })
+  sendBuzyLoad(win, { code: 'init', title: selectedPKG.pkgType === 'dx' ? 'installingRB3DX' : 'installingTU5', steps: selectedPKG.pkgType === 'dx' ? ['extractingDeluxePKG', 'installingRB3DX'] : ['extractingTU5PKG', 'installingTU5'], onCompleted: ['refreshRB3Stats', 'resetDeluxeInstallScreenState'] })
   const rb3GameFolder = getRB3USRDIR(devhdd0Path).gotoDir('../')
   const tempFolderPath = await BinaryAPI.ps3pPKGRipper(selectedPKG.pkgPath, temporaryDirectory())
 
