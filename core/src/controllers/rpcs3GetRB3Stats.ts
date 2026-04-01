@@ -1,6 +1,9 @@
 import { rpcs3GetRB3Stats as getStats, isRPCS3Devhdd0PathValid, isRPCS3ExePathValid, type RockBand3Data } from 'rbtools/lib'
 import { readUserConfigFile, sendDialog, sendMessageBox, useHandler } from '../core.exports'
 
+/**
+ * Retrieves data from Rock Band 3 installation on the RPCS3 emulator.
+ */
 export const rpcs3GetRB3Stats = useHandler(async (win, __): Promise<false | RockBand3Data> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {

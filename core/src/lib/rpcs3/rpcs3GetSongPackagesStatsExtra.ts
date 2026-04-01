@@ -4,7 +4,8 @@ import { createHashFromBuffer, DirPath, FilePath, MyObject, parseReadableBytesSi
 import { DTAParser, EDATFile, RBTools } from 'rbtools'
 import { getOfficialSongPackageStatsFromHash, isRPCS3Devhdd0PathValid, rpcs3GenSongPackageManifest, type OfficialSongPackageStats, type RB3CompatibleDTAFile } from 'rbtools/lib'
 import { useDefaultOptions } from 'use-default-options'
-import { getRB1USRDIR, getRB3USRDIR } from '../../core.exports'
+import { getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir } from '../../core.exports'
+import { createRSPackImageV1, parseRSPackImageFile, type RSPackImageV1Object } from '../../lib.exports'
 
 export interface RPCS3SongPackagesObjectExtra {
   /**
@@ -65,9 +66,15 @@ export interface RPCS3SongPackagesObjectExtra {
    */
   packageFiles: string[]
   /**
+   * An object with values that will be used exclusively on Rockshelf.
+   */
+  packageData: RSPackImageV1Object
+  /**
    * An object with known properties of the official song package where the installed song package belongs to. The value might be `undefined` if the song package contents hash does not match any official song package contents hash.
    */
-  official: OfficialSongPackageStats | undefined
+  official?: OfficialSongPackageStats
+
+  // Rockshelf
 }
 
 export interface RPCS3SongPackagesDataExtra {
@@ -132,8 +139,6 @@ export interface RPCS3PackageFilesManifestData {
   packageFiles: string[]
 }
 
-const RB1_RAP_FOLDER = 'CCF0099'
-
 export interface RPCS3SongPackageStatsOptions {
   /**
    * Excludes the Rock Band 3 on-disc song package. Default is `false`.
@@ -171,6 +176,12 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
       songnames: rb3SongsJSON.map((song) => song.songname).toSorted(),
       songIDs: rb3SongsJSON.map((song) => song.song_id).toSorted(),
       packageFiles: [],
+      packageData: {
+        fileVersion: 1,
+        packageName: 'Rock Band 3',
+        installationSrc: 'pkg',
+        installationType: 'other',
+      },
       official: {
         name: 'Rock Band 3',
         code: 'rb3',
@@ -221,6 +232,19 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
         const songIDs = parsedData.songs.map((song) => song.song_id).toSorted()
 
+        const thumbnailSrc = packagePath.gotoFile('folder.jpg')
+        let packageData: RSPackImageV1Object
+
+        if (!thumbnailSrc.exists) {
+          let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
+          if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+
+          packageData = { fileVersion: 1, installationSrc: 'merged', installationType: 'other', packageName: official?.name || packagePath.name }
+          await createRSPackImageV1(newPackageImage, thumbnailSrc, packageData)
+        } else {
+          packageData = await parseRSPackImageFile(thumbnailSrc)
+        }
+
         const pack = new MyObject<RPCS3SongPackagesObjectExtra>({
           name: packagePath.name,
           path: packagePath.path,
@@ -236,6 +260,7 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
           songnames,
           songIDs,
           packageFiles,
+          packageData,
           official,
         })
 
@@ -246,7 +271,7 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
 
   const rb1UsrDir = getRB1USRDIR(devhdd0)
   if (rb1UsrDir.exists) {
-    const allRB1PackagesFolder = (await rb1UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== RB1_RAP_FOLDER) as DirPath[]
+    const allRB1PackagesFolder = (await rb1UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== 'CCF0099') as DirPath[]
 
     if (allRB1PackagesFolder.length > 0) {
       for (const packagePath of allRB1PackagesFolder) {
@@ -266,8 +291,8 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
         const official = getOfficialSongPackageStatsFromHash('extractedRPCS3', contentsHash)
 
         // Comment the next line if you want to see the extracted RPCS3 of unknown RB1 packages
-        // if (!official) continue
-        // if (official?.isDuplicatedForRB3) continue
+        if (!official) continue
+        if (official?.isDuplicatedForRB3) continue
 
         rb1PackagesCount++
         rb1PackagesSongsCount += parsedData.songs.length
@@ -277,6 +302,19 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
         const entriesIDs = parsedData.songs.map((song) => song.id).toSorted()
         const songnames = parsedData.songs.map((song) => song.songname).toSorted()
         const songIDs = parsedData.songs.map((song) => song.song_id).toSorted()
+
+        const thumbnailSrc = packagePath.gotoFile('folder.jpg')
+        let packageData: RSPackImageV1Object
+
+        if (!thumbnailSrc.exists) {
+          let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
+          if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+
+          packageData = { fileVersion: 1, installationSrc: 'merged', installationType: 'other', packageName: official?.name || packagePath.name }
+          await createRSPackImageV1(newPackageImage, thumbnailSrc, packageData)
+        } else {
+          packageData = await parseRSPackImageFile(thumbnailSrc)
+        }
 
         const pack = new MyObject<RPCS3SongPackagesObjectExtra>({
           name: packagePath.name,
@@ -293,6 +331,7 @@ export const rpcs3GetSongPackagesStatsExtra = async (devhdd0Path: DirPathLikeTyp
           songnames,
           songIDs,
           packageFiles,
+          packageData,
           official,
         })
 

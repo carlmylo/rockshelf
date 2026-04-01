@@ -5,7 +5,7 @@ import { useWindowState } from '@renderer/stores/Window.state'
 import { animate, AnimatedButton, AnimatedSection, TransComponent } from '@renderer/lib.exports'
 import clsx from 'clsx'
 import { BRAFlag, MEXFlag, USAFlag } from '@renderer/assets/images'
-import { UserConfigObject } from 'rockshelf-core'
+import { RPCS3SongPackagesDataExtra, UserConfigObject } from 'rockshelf-core'
 import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './LogoScreen.state'
 
@@ -98,16 +98,19 @@ export function FirstTimeScreen() {
             })
 
             const rb3Stats = await window.api.rpcs3GetRB3Stats()
-            if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
+             console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
             let saveData: ParsedRB3SaveData | false = false
             let instrumentScores: InstrumentScoreData | false = false
+            let packagesData: RPCS3SongPackagesDataExtra | false = false
             if (typeof rb3Stats === 'object' && rb3Stats.hasSaveData) {
               saveData = await window.api.rpcs3GetSaveDataStats()
-              if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
+               console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
               if (saveData) {
                 instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
-                if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+                 console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
               }
+              packagesData = await window.api.rpcs3GetPackagesData()
+               console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', packagesData)
             }
 
             setWindowState({

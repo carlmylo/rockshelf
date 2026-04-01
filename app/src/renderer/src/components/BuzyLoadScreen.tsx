@@ -30,12 +30,12 @@ export function BuzyLoadScreen() {
             active.steps.map((activeSteps, activeStepsIndex) => {
               return (
                 <div key={`active.steps${activeStepsIndex}`} className="mb-4 flex-row! items-center">
-                  {activeStepsIndex === step && <LoadingIcon className="h-4 w-4 animate-spin" />}
-                  {activeStepsIndex < step && <CheckedCircleIcon className="h-4 w-4 text-green-500" />}
+                  {activeStepsIndex === step && !isCompleted && <LoadingIcon className="h-4 w-4 animate-spin" />}
+                  {(activeStepsIndex < step || isCompleted) && <CheckedCircleIcon className="h-4 w-4 text-green-500" />}
                   {activeStepsIndex > step && <div className="h-4 w-4" />}
                   <h2 className="ml-2 text-base">
                     {t(activeSteps)}
-                    {activeStepsIndex === step ? '...' : ''}
+                    {activeStepsIndex === step && !isCompleted ? '...' : ''}
                   </h2>
                 </div>
               )
@@ -51,7 +51,7 @@ export function BuzyLoadScreen() {
                     case 'refreshRB3Stats':
                     default: {
                       const rb3Stats = await window.api.rpcs3GetRB3Stats()
-                      if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
+                      console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
                       setWindowState({ rb3Stats })
                       break
                     }

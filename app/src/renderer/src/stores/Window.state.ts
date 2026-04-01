@@ -1,5 +1,6 @@
 import { ParsedRB3SaveData, InstrumentScoreData } from 'rbtools'
 import { RockBand3Data } from 'rbtools/lib'
+import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
 import { create } from 'zustand'
 
 export interface WindowStateProps {
@@ -19,7 +20,7 @@ export interface WindowStateProps {
   rb3Stats: false | RockBand3Data | 'loading'
   saveData: false | ParsedRB3SaveData | 'loading'
   instrumentScores: false | InstrumentScoreData | 'loading'
-  packages: unknown
+  packages: false | RPCS3SongPackagesDataExtra | 'loading'
 }
 
 export interface WindowStateActions {
@@ -51,7 +52,7 @@ const defaultState: WindowStateProps = {
   rb3Stats: false,
   instrumentScores: false,
   saveData: false,
-  packages: null,
+  packages: false,
 }
 
 export const useWindowState = create<WindowStateHook>()((set, get) => ({

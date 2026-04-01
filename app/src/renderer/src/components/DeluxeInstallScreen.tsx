@@ -32,7 +32,7 @@ export function DeluxeInstallScreen() {
         setDeluxeInstallScreenState({ commitData: 'loading' })
         try {
           const { data } = await axios.get<GitHubCommitResponse>(`https://api.github.com/repos/hmxmilohax/rock-band-3-deluxe/commits/${selectedPKG.dxHash}`, { responseType: 'json', timeout: 6000 })
-          if (import.meta.env.DEV) console.log('struct GitHubCommitResponse ["app\\src\\renderer\\src\\app\\types.ts"]:', data)
+           console.log('struct GitHubCommitResponse ["app\\src\\renderer\\src\\app\\types.ts"]:', data)
           setDeluxeInstallScreenState({ commitData: data })
         } catch (err) {
           if (err instanceof AxiosError || err instanceof Error) setWindowState({ err })
@@ -51,7 +51,7 @@ export function DeluxeInstallScreen() {
           setDeluxeInstallScreenState({ aheadCommitData: 'loading' })
           try {
             const { data } = await axios.get<GitHubCommitCompare>(`https://api.github.com/repos/hmxmilohax/rock-band-3-deluxe/compare/develop...${selectedPKG.dxHash}`, { responseType: 'json', timeout: 6000 })
-            if (import.meta.env.DEV) console.log('struct GitHubCommitCompare ["app\\src\\renderer\\src\\app\\types.ts"]:', data)
+             console.log('struct GitHubCommitCompare ["app\\src\\renderer\\src\\app\\types.ts"]:', data)
 
             setDeluxeInstallScreenState({ aheadCommitData: data })
           } catch (err) {
@@ -102,7 +102,7 @@ export function DeluxeInstallScreen() {
             setDeluxeInstallScreenState({ selectedPKG: 'loading' })
             try {
               const newSelectedPKG = await window.api.selectPKGFileToInstall()
-              if (import.meta.env.DEV) console.log('struct SelectPKGFileReturnObject [core/src/controllers/selectPKGFileToInstall.ts]', newSelectedPKG)
+               console.log('struct SelectPKGFileReturnObject [core/src/controllers/selectPKGFileToInstall.ts]', newSelectedPKG)
 
               if (!newSelectedPKG) {
                 setWindowState({ disableButtons: false })

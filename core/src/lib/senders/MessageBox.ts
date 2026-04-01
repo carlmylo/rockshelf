@@ -30,13 +30,13 @@ export interface MessageBoxObject {
 }
 
 /**
- * Sends a small message event to a renderer process.
+ * Sends a small message box event to the renderer process.
  * - - - -
  * @param {BrowserWindow} win Target `BrowserWindow` that will receive the message.
- * @param {MessagePopUpOptions} options Message configuration payload.
+ * @param {MessagePopUpOptions} message Message configuration payload.
  * @returns {true} Always returns true after dispatching the message.
  */
-export const sendMessageBox = (win: BrowserWindow, options: MessageBoxObject): true => {
-  win.webContents.send('sendMessageBox', options)
+export const sendMessageBox = (win: BrowserWindow, message: MessageBoxObject): true => {
+  win.webContents.send('sendMessageBox', message)
   return true
 }

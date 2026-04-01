@@ -3,6 +3,9 @@ import type { SelectPKGFileReturnObject } from '../controllers.exports'
 import { readUserConfigFile, sendMessageBox, useHandler } from '../core.exports'
 import { installPatchTypePKGForRB3 } from '../lib.exports'
 
+/**
+ * Installs a PKG file into the `dev_hdd0` folder.
+ */
 export const installPKGFile = useHandler(async (win, _, selectedPKG: SelectPKGFileReturnObject): Promise<boolean> => {
   const userConfig = await readUserConfigFile()
   if (!userConfig) {

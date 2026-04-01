@@ -1,7 +1,7 @@
 import { app, BrowserWindow, protocol, net } from 'electron'
 import { pathToFileURL } from 'node:url'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { checkDeps, createWindow, getRB3USRDIR, getRockshelfModuleRootDir, initMainProcessHandlers, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
+import { checkDeps, createWindow, getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir, initMainProcessHandlers, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
 
 export async function initRockshelfMainProcess(options: CreateWindowOptions): Promise<void> {
   await setElectronUserDataFolder(app, 'Rockshelf')
@@ -30,6 +30,15 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     if (!userConfig) throw new Error('User config file not found, aborting...')
     const rb3usrdir = getRB3USRDIR(userConfig.devhdd0Path)
     const packageFolderName = request.url.slice('rb3packimg://'.length)
+    const filePath = rb3usrdir.gotoFile(`${packageFolderName}/folder.jpg`)
+    return net.fetch(pathToFileURL(filePath.path).toString())
+  })
+
+  protocol.handle('rb1packimg', async (request) => {
+    const userConfig = await readUserConfigFile()
+    if (!userConfig) throw new Error('User config file not found, aborting...')
+    const rb3usrdir = getRB1USRDIR(userConfig.devhdd0Path)
+    const packageFolderName = request.url.slice('rb1packimg://'.length)
     const filePath = rb3usrdir.gotoFile(`${packageFolderName}/folder.jpg`)
     return net.fetch(pathToFileURL(filePath.path).toString())
   })

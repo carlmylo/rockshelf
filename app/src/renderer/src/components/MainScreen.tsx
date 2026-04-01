@@ -10,6 +10,7 @@ import { RockBand3Data } from 'rbtools/lib'
 import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
 import { useMessageBoxState } from './MessageBox.state'
 import { useConfigScreenState } from './ConfigScreen.state'
+import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 
 export function MainScreen() {
   const { t } = useTranslation()
@@ -22,6 +23,7 @@ export function MainScreen() {
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const setDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.setDeluxeInstallScreenState)
   const setConfigScreenState = useConfigScreenState((x) => x.setConfigScreenState)
+  const setMyPackagesScreenState = useMyPackagesScreenState((x) => x.setMyPackagesScreenState)
 
   return (
     <AnimatedSection id="MainScreen" condition={active} className="z-0 h-full max-h-full w-full max-w-full overflow-y-hidden p-8">
@@ -54,15 +56,15 @@ export function MainScreen() {
               try {
                 setTimeout(async () => {
                   const newRB3Stats = await window.api.rpcs3GetRB3Stats()
-                  if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
+                   console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
                   let newSaveData: ParsedRB3SaveData | false = false
                   let newInstrumentScores: InstrumentScoreData | false = false
                   if (typeof rb3Stats === 'object' && (rb3Stats.hasSaveData || rb3Stats.userName !== null)) {
                     newSaveData = await window.api.rpcs3GetSaveDataStats()
-                    if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', newSaveData)
+                     console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', newSaveData)
                     if (newSaveData) {
                       newInstrumentScores = await window.api.rpcs3GetInstrumentScores(newSaveData)
-                      if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrumentScores)
+                       console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrumentScores)
                     }
                   }
                   setWindowState({ disableButtons: false, rb3Stats: newRB3Stats, saveData: newSaveData, instrumentScores: newInstrumentScores })
@@ -98,6 +100,16 @@ export function MainScreen() {
                   }}
                 >
                   {t('createNewPackage')}
+                </button>
+                <button
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  onClick={async () => {
+                    setWindowState({ disableButtons: true })
+                    setMyPackagesScreenState({ active: true })
+                    setWindowState({ disableButtons: false })
+                  }}
+                >
+                  {t('myPackages')}
                 </button>
                 <button
                   className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"

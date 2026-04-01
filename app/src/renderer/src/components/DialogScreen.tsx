@@ -3,6 +3,7 @@ import { useDialogScreenState } from './DialogScreen.state'
 import { useTranslation } from 'react-i18next'
 import { ButtonHTMLAttributes } from 'react'
 import clsx from 'clsx'
+import { useWindowState } from '@renderer/stores/Window.state'
 
 function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -15,32 +16,52 @@ function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HT
 export function DialogScreen() {
   const { t } = useTranslation()
   const active = useDialogScreenState((x) => x.active)
+  const setDialogScreenState = useDialogScreenState((x) => x.setDialogScreenState)
+  const setWindowState = useWindowState((x) => x.setWindowState)
 
   return (
     <AnimatedSection id="DialogScreen" condition={active !== null} {...animate({ opacity: true })} className="absolute! z-100 h-full w-full items-center justify-center bg-black/90 p-16 backdrop-blur-lg">
       {active !== null && (
         <>
-          <h1 className="mb-2 text-[2rem] uppercase">{t(`${active}Title`)}</h1>
+          <h1 className="mb-2 text-center text-[2rem] uppercase">{t(`${active}Title`)}</h1>
           <p className="text-center">{t(`${active}Text`)}</p>
         </>
       )}
       <div className="mt-8 flex-row! items-center">
         {(() => {
-          switch (active) {
-            case null:
-            default:
-              return null
-            case 'corruptedUserConfig':
-              return (
-                <DialogButton
-                  onClick={async () => {
+          if (active?.startsWith('corruptedUserConfig')) {
+            return (
+              <DialogButton
+                onClick={async () => {
+                  setWindowState({ disableButtons: true })
+                  try {
                     await window.api.deleteUserConfigAndRestart()
-                  }}
-                >
-                  {t('deleteUserConfigData')}
-                </DialogButton>
-              )
-          }
+                  } catch (err) {
+                    if (err instanceof Error) setWindowState({ err })
+                  }
+                }}
+              >
+                {t('deleteUserConfigData')}
+              </DialogButton>
+            )
+          } else if (active?.startsWith('corruptedPackagesCache')) {
+            return (
+              <DialogButton
+                onClick={async () => {
+                  setWindowState({ disableButtons: true })
+                  try {
+                    const newPackagesData = await window.api.rpcs3GetPackagesData(true)
+                    setDialogScreenState({active: null})
+                    setWindowState({ packages: newPackagesData, disableButtons: false })
+                  } catch (err) {
+                    if (err instanceof Error) setWindowState({ err })
+                  }
+                }}
+              >
+                {t('recreatePackagesCacheFile')}
+              </DialogButton>
+            )
+          } else return null
         })()}
       </div>
     </AnimatedSection>

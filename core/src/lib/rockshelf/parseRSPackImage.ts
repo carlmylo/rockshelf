@@ -82,6 +82,9 @@ export const parseRSDATBufferV1 = async (rsdatBuffer: Buffer): Promise<RSPackIma
   const reader = BinaryReader.fromBuffer(rsdatBuffer)
   const installationType = (await reader.readUInt8()) as RSPackImageInstallationTypeNumbers
   const installationSrc = (await reader.readUInt8()) as RSPackImageInstallationSourceNumbers
+
+  reader.padding(14)
+  
   const packageNameLength = await reader.readUInt8()
   const packageName = await reader.readUTF8(packageNameLength)
 

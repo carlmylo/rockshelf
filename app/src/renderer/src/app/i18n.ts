@@ -3,6 +3,7 @@ import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 import { appENUSLocale } from './locale/en-US'
 import { appPTBRLocale } from './locale/pt-BR'
+import { appESLALocale } from './locale/es-LA'
 
 i18n
   .use(initReactI18next)
@@ -15,6 +16,9 @@ i18n
       },
       'pt-BR': {
         translation: appPTBRLocale,
+      },
+      'es-LA': {
+        translation: appESLALocale,
       },
     },
     fallbackLng: 'en-US',

@@ -22,6 +22,7 @@
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
+    "@borewit/text-codec": "^0.2.2",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@vitejs/plugin-react": "^5.2.0",
@@ -32,6 +33,7 @@
     "file-type": "^21.3.1",
     "i18next": "^25.8.18",
     "i18next-browser-languagedetector": "^8.2.1",
+    "ieee754": "^1.2.1",
     "jschardet": "^3.1.4",
     "motion": "^12.36.0",
     "ms": "^2.1.3",

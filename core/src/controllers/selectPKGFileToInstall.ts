@@ -33,6 +33,9 @@ export interface SelectPKGFileReturnObject {
   official?: OfficialSongPackageStats
 }
 
+/**
+ * Opens a prompt to select a PKG file and retrieve data from the selected PKG file.
+ */
 export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectPKGFileReturnObject | false> => {
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'pkgFile'), extensions: ['pkg'] }] })
 

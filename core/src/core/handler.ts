@@ -20,7 +20,7 @@ export const addHandler = (channel: string, listener: HandlerListenerFuntion): v
 }
 
 /**
- * Identity helper used to strongly type IPC handlers.
+ * Helper used to strongly type IPC handlers.
  *
  * This function exists purely for type inference and does not
  * modify the handler in any way.

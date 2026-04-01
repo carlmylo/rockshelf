@@ -2,6 +2,9 @@ import { dialog } from 'electron'
 import { sendMessageBox, useHandler } from '../core.exports'
 import { isRPCS3Devhdd0PathValid } from 'rbtools/lib'
 
+/**
+ * Opens a prompt for the user to select a valid `dev_hdd0` folder.
+ */
 export const selectDevhdd0Dir = useHandler(async (win): Promise<string | false> => {
   const selection = await dialog.showOpenDialog({ properties: ['openDirectory'] })
   if (selection.canceled) {

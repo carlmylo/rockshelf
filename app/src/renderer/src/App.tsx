@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FirstTimeScreen, LogoScreen, MainScreen, MessageBox, Topbar, WindowFrame } from './components.exports'
+import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,7 @@ import { useLogoScreenState } from './components/LogoScreen.state'
 import { useMessageBoxState } from './components/MessageBox.state'
 import { useDialogScreenState } from './components/DialogScreen.state'
 import { useBuzyLoadScreenState } from './components/BuzyLoadScreen.state'
+import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
 
 export function App() {
   const { i18n } = useTranslation()
@@ -37,27 +38,32 @@ export function App() {
           return
         }
 
-        if (import.meta.env.DEV) console.log('struct UserConfigObject ["core/src/core/userConfigData.ts"]:', hasUserConfig)
+        console.log('struct UserConfigObject ["core/src/core/userConfigData.ts"]:', hasUserConfig)
         setUserConfigState(hasUserConfig)
 
         const rb3Stats = await window.api.rpcs3GetRB3Stats()
-        if (import.meta.env.DEV) console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
+        console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
 
         let saveData: ParsedRB3SaveData | false = false
         let instrumentScores: InstrumentScoreData | false = false
+        let packagesData: RPCS3SongPackagesDataExtra | false = false
         if (typeof rb3Stats === 'object' && rb3Stats.hasSaveData) {
           saveData = await window.api.rpcs3GetSaveDataStats()
-          if (import.meta.env.DEV) console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
+          console.log('struct ParsedRB3SaveData ["rbtools/src/lib/rpsc3/getSaveData.ts"]:', saveData)
           if (saveData) {
             instrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
-            if (import.meta.env.DEV) console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
+            console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', instrumentScores)
           }
+
+          packagesData = await window.api.rpcs3GetPackagesData()
+          console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', packagesData)
         }
 
         setWindowState({
           rb3Stats,
           saveData,
           instrumentScores,
+          packages: packagesData,
           disableButtons: false,
         })
         setLogoScreenState({ active: false })
@@ -86,18 +92,20 @@ export function App() {
 
   useEffect(function initMessageListener() {
     window.api.onMessage((_, message) => {
-      if (import.meta.env.DEV) console.log('struct MessageBoxObject [core/src/core/rendererSenders.ts]', message)
+      console.log('struct MessageBoxObject [core/src/core/rendererSenders.ts]', message)
       setMessageBoxState({ message })
     })
   }, [])
 
   useEffect(function initDialogListener() {
-    window.api.onDialog((_, code) => setDialogScreenState({ active: code }))
+    window.api.onDialog((_, code) => {
+      return setDialogScreenState({ active: code })
+    })
   }, [])
 
   useEffect(function initBuzyLoadListener() {
     window.api.onBuzyLoad((_, func) => {
-      if (import.meta.env.DEV) {
+      {
         if (func.code === 'init') console.log('struct BuzyLoadInitObject [core/src/core/rendererSenders.ts]', func)
         else console.log('struct BuzyLoadObject [core/src/core/rendererSenders.ts]', func)
       }
@@ -110,7 +118,11 @@ export function App() {
       }
       //  else if (func.code === 'throwError') { }
     })
-  })
+  }, [])
+
+  useEffect(function initRendererConsoleListener() {
+    window.api.onRendererConsole((_, val) => console.log(val))
+  }, [])
   return (
     <>
       <Topbar />
@@ -120,10 +132,12 @@ export function App() {
         <CreateNewPackageScreen />
         <DeluxeInstallScreen />
         <DialogScreen />
+        <FatalErrorScreen />
         <FirstTimeScreen />
         <LogoScreen />
         <MainScreen />
         <MessageBox />
+        <MyPackagesScreen />
       </WindowFrame>
     </>
   )

@@ -63,6 +63,7 @@ export const createRSPackImageV1 = async (imageFilePath: FilePathLikeTypes, dest
       }
     })()
   )
+  extraData.write(Buffer.alloc(14))
   extraData.writeUInt8(packageName.length)
   extraData.writeUTF8(packageName)
 
