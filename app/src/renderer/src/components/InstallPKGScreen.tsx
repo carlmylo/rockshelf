@@ -3,14 +3,11 @@ import { useEffect, useMemo } from 'react'
 import { useInstallPKGScreenState } from './InstallPKGScreen.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
+import { useShallow } from 'zustand/shallow'
 
 export function InstallPKGScreen() {
   const { t } = useTranslation()
-  const selectedPKG = useInstallPKGScreenState((x) => x.selectedPKG)
-  const resetInstallPKGScreenState = useInstallPKGScreenState((x) => x.resetInstallPKGScreenState)
-  const setInstallPKGScreenState = useInstallPKGScreenState((x) => x.setInstallPKGScreenState)
-  const packageFolderName = useInstallPKGScreenState((x) => x.packageFolderName)
-  const thumbnailPath = useInstallPKGScreenState((x) => x.thumbnailPath)
+  const { packageFolderName, resetInstallPKGScreenState, selectedPKG, setInstallPKGScreenState, thumbnailPath } = useInstallPKGScreenState(useShallow((x) => ({ selectedPKG: x.selectedPKG, resetInstallPKGScreenState: x.resetInstallPKGScreenState, setInstallPKGScreenState: x.setInstallPKGScreenState, packageFolderName: x.packageFolderName, thumbnailPath: x.thumbnailPath })))
   const disableButtons = useWindowState((x) => x.disableButtons)
   const active = useMemo(() => selectedPKG !== null, [selectedPKG])
 
@@ -47,7 +44,7 @@ export function InstallPKGScreen() {
                 <h1 className="mb-1 uppercase">{t('pkgSize')}</h1>
                 <p className="mb-3 font-mono">{getReadableBytesSize(selectedPKG.pkgSize)}</p>
                 <h1 className="mb-1 uppercase">{t('packageFolderName')}</h1>
-                <input className="rounded-xs bg-neutral-900 px-2 h-7" value={packageFolderName} onChange={(ev) => setInstallPKGScreenState({ packageFolderName: ev.target.value })} />
+                <input className="h-7 rounded-xs bg-neutral-900 px-2" value={packageFolderName} onChange={(ev) => setInstallPKGScreenState({ packageFolderName: ev.target.value })} />
                 {/* <p>{JSON.stringify(selectedPKG.stat, null, 4)}</p> */}
               </div>
             </div>

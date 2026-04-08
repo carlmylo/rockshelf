@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { ipcRenderer, shell, webUtils, type IpcRenderer, type IpcRendererEvent } from 'electron'
 import type { Promisable } from 'type-fest'
-import type { openUserDataFolder, readUserConfigFile, MessageBoxObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize, BuzyLoadInitObject, BuzyLoadScreenSenderObject, BuzyLoadErrorObject } from './core.exports'
-import type { deletePackageThumbnails, deleteUserConfigAndRestart, getDTACatalog, installHighMemoryPatch, installPKGFile, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
+import type { openUserDataFolder, readUserConfigFile, MessageBoxObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize, BuzyLoadInitObject, BuzyLoadScreenSenderObject, BuzyLoadErrorObject, DialogScreenPromptsTypes } from './core.exports'
+import type { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, getDTACatalog, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
 import type { ParsedRB3SaveData } from 'rbtools'
-import type { DTACatalogTypes } from './lib.exports'
+import type { DTACatalogTypes, RPCS3SongPackagesObjectExtra } from './lib.exports'
 import type { FatalErrorObject } from './lib/senders/fatalError'
+import type { RB3CompatibleDTAFile } from 'rbtools/lib'
 
 const invoke = ipcRenderer.invoke.bind(ipcRenderer)
 const on = ipcRenderer.on.bind(ipcRenderer)
 
 export type OnBuzyLoadCallback = (event: IpcRendererEvent, func: BuzyLoadScreenSenderObject | BuzyLoadInitObject | BuzyLoadErrorObject) => void
-export type OnDialogScreenCallback = (event: IpcRendererEvent, code: string) => Promisable<any>
+export type OnDialogScreenCallback = (event: IpcRendererEvent, code: DialogScreenPromptsTypes) => Promisable<any>
 export type OnLocaleRequestCallback = (event: IpcRendererEvent, uuid: string, key: string) => void
 export type OnMessageCallback = (event: IpcRendererEvent, message: MessageBoxObject) => Promisable<any>
 export type OnRendererConsoleCallback = (event: IpcRendererEvent, value: any) => Promisable<any>
@@ -108,8 +109,10 @@ export const rockshelfAPI = {
    */
   windowMaximize: async (): Promise<ReturnType<typeof windowMaximize>> => await invoke('windowMaximize'),
 
+  deletePackageThumbnails: async (): ReturnType<typeof deletePackageThumbnails> => await invoke('deletePackageThumbnails'),
   deleteUserConfigAndRestart: async (): ReturnType<typeof deleteUserConfigAndRestart> => await invoke('deleteUserConfigAndRestart'),
   getDTACatalog: async (selectedIndex: number, type?: DTACatalogTypes): ReturnType<typeof getDTACatalog> => await invoke('getDTACatalog', selectedIndex, type),
+  getSongArtworkDataURL: async (packageDetails: RPCS3SongPackagesObjectExtra, songDetails: RB3CompatibleDTAFile): ReturnType<typeof getSongArtworkDataURL> => await invoke('getSongArtworkDataURL', packageDetails, songDetails),
   installHighMemoryPatch: async (): ReturnType<typeof installHighMemoryPatch> => await invoke('installHighMemoryPatch'),
   installPKGFile: async (selectedPKG: SelectPKGFileReturnObject): ReturnType<typeof installPKGFile> => await invoke('installPKGFile', selectedPKG),
   openFolderInExplorer: async (folderPath: string): ReturnType<typeof getDTACatalog> => await invoke('openFolderInExplorer', folderPath),
@@ -126,5 +129,5 @@ export const rockshelfAPI = {
   selectRPCS3Exe: async (): ReturnType<typeof selectRPCS3Exe> => await invoke('selectRPCS3Exe'),
   testError: async (message?: string): ReturnType<typeof testUserConfig> => await invoke('testError', message),
   testUserConfig: async (): ReturnType<typeof testUserConfig> => await invoke('testUserConfig'),
-  deletePackageThumbnails: async (): ReturnType<typeof deletePackageThumbnails> => await invoke('deletePackageThumbnails'),
+  deletePackage: async (pkgIndex: number): ReturnType<typeof deletePackage> => await invoke('deletePackage', pkgIndex),
 } as const

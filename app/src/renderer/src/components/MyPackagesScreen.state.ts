@@ -5,7 +5,10 @@ export interface MyPackagesScreenStateProps {
   active: boolean
   selPKG: number
   catalog: DTACatalogByTitleObject | false | 'loading'
-  hoveredPkg: number
+  hoveredPKG: number
+  selSong: number
+  isArtworkLoading: boolean
+  artworkURL: string | null
 }
 
 export interface MyPackagesScreenStateActions {
@@ -33,7 +36,10 @@ const defaultState: MyPackagesScreenStateProps = {
   active: false,
   selPKG: -1,
   catalog: false,
-  hoveredPkg: -1,
+  hoveredPKG: -1,
+  selSong: -1,
+  isArtworkLoading: true,
+  artworkURL: null,
 }
 
 export const useMyPackagesScreenState = create<MyPackagesScreenStateHook>()((set, get) => ({

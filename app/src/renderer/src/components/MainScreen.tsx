@@ -12,16 +12,12 @@ import { useMessageBoxState } from './MessageBox.state'
 import { useConfigScreenState } from './ConfigScreen.state'
 import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 import { useInstallPKGScreenState } from './InstallPKGScreen.state'
+import { useShallow } from 'zustand/shallow'
 
 export function MainScreen() {
   const { t } = useTranslation()
   const active = useMainScreenState((x) => x.active)
-  const rb3Stats = useWindowState((x) => x.rb3Stats)
-  const saveData = useWindowState((x) => x.saveData)
-  const instrumentScores = useWindowState((x) => x.instrumentScores)
-  const packages = useWindowState((x) => x.packages)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const setWindowState = useWindowState((x) => x.setWindowState)
+  const { disableButtons, saveData, setWindowState, rb3Stats, instrumentScores, packages } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, saveData: x.saveData, setWindowState: x.setWindowState, rb3Stats: x.rb3Stats, instrumentScores: x.instrumentScores, packages: x.packages })))
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const setDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.setDeluxeInstallScreenState)
   const setConfigScreenState = useConfigScreenState((x) => x.setConfigScreenState)
@@ -46,15 +42,26 @@ export function MainScreen() {
                   <h2 className="font-pentatonic text-sm">{instrumentScores.scoreCount}</h2>
                 </div>
                 {typeof packages === 'object' && (
-                  <div className="">
-                    <h1 className="text-[0.65rem] uppercase">{t('starsCount')}</h1>
-                    <div className="flex-row! items-center">
-                      <img title={t(instrumentScores.instrument)} src='rbicons://rb4-stars' className="mr-1 h-3 min-h-3 w-3 min-w-3 relative! top-[0.05rem]" />
-                      <h2 className="font-pentatonic text-sm">
-                        {instrumentScores.starsCount}/{packages.starsCount}
-                      </h2>
+                  <>
+                    <div className="mr-4">
+                      <h1 className="text-[0.65rem] uppercase">{t('starsCount')}</h1>
+                      <div className="flex-row! items-center">
+                        <img src="rbicons://rb4-stars" className="relative! top-[0.05rem] mr-1 h-3 min-h-3 w-3 min-w-3" />
+                        <h2 className="font-pentatonic text-sm">
+                          {instrumentScores.starsCount}/{packages.starsCount}
+                        </h2>
+                      </div>
                     </div>
-                  </div>
+                    <div>
+                      <h1 className="text-[0.65rem] uppercase">{t('goldStars')}</h1>
+                      <div className="flex-row! items-center">
+                        <img src="rbicons://rb4-stars-gold" className="relative! top-[0.05rem] mr-1 h-3 min-h-3 w-3 min-w-3" />
+                        <h2 className="font-pentatonic text-sm">
+                          {instrumentScores.goldStars}/{packages.allSongsPlusRB3}
+                        </h2>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
               <div className="mr-auto"></div>

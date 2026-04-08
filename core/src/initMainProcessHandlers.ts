@@ -1,17 +1,19 @@
 import { shell, type BrowserWindow, type IpcMainInvokeEvent } from 'electron'
 import type { Promisable } from 'type-fest'
-import { deletePackageThumbnails, deleteUserConfigAndRestart, getDTACatalog, installHighMemoryPatch, installPKGFile, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from '../controllers.exports'
-import { openUserDataFolder, readUserConfigFile, saveUserConfigFile, windowClose, windowMaximize, windowMinimize, type UserConfigObject } from '../core.exports'
-import { addHandler } from './handler'
+import { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, getDTACatalog, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
+import { openUserDataFolder, readUserConfigFile, saveUserConfigFile, windowClose, windowMaximize, windowMinimize, type UserConfigObject } from './core.exports'
+import { addHandler } from './core/handler'
 
 export type HandlerFnType = (window: BrowserWindow, event: IpcMainInvokeEvent, ...args: any[]) => Promisable<any>
 export type InitHandlersArray = [string, HandlerFnType][]
 
 export const initMainProcessHandlers = (): void => {
   const handlers: InitHandlersArray = [
+    ['deletePackage', deletePackage],
     ['deletePackageThumbnails', deletePackageThumbnails],
     ['deleteUserConfigAndRestart', deleteUserConfigAndRestart],
     ['getDTACatalog', getDTACatalog],
+    ['getSongArtworkDataURL', getSongArtworkDataURL],
     ['installHighMemoryPatch', installHighMemoryPatch],
     ['installPKGFile', installPKGFile],
     ['openFolderInExplorer', async (_, __, folderPath: string) => await shell.openPath(folderPath)],

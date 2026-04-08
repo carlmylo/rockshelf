@@ -7,19 +7,13 @@ import { useMessageBoxState } from './MessageBox.state'
 import { RockBand3Data } from 'rbtools/lib'
 import clsx from 'clsx'
 import { BRAFlag, MEXFlag, USAFlag, ARGFlag, BOLFlag, COLFlag, PARYFlag, PERUFlag, URUFlag, VEZFlag, bandIcon, guitarIcon, bassIcon, drumsIcon, keysIcon, vocalsIcon, proGuitarIcon, proBassIcon, proDrumsIcon, proKeysIcon, harm3Icon } from '@renderer/assets/images'
+import { useShallow } from 'zustand/shallow'
 
 export function ConfigScreen() {
   const { i18n, t } = useTranslation()
-  const active = useConfigScreenState((x) => x.active)
-  const resetConfigScreenState = useConfigScreenState((x) => x.resetConfigScreenState)
-  const devhdd0Path = useUserConfigState((x) => x.devhdd0Path)
-  const rpcs3ExePath = useUserConfigState((x) => x.rpcs3ExePath)
-  const mostPlayedInstrument = useUserConfigState((x) => x.mostPlayedInstrument)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const saveData = useWindowState((x) => x.saveData)
-  const setWindowState = useWindowState((x) => x.setWindowState)
-  const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
-  const getUserConfigState = useUserConfigState((x) => x.getUserConfigState)
+  const { active, resetConfigScreenState } = useConfigScreenState(useShallow((x) => ({ active: x.active, resetConfigScreenState: x.resetConfigScreenState })))
+  const { devhdd0Path, rpcs3ExePath, mostPlayedInstrument, getUserConfigState, setUserConfigState } = useUserConfigState(useShallow((x) => ({ devhdd0Path: x.devhdd0Path, rpcs3ExePath: x.rpcs3ExePath, mostPlayedInstrument: x.mostPlayedInstrument, getUserConfigState: x.getUserConfigState, setUserConfigState: x.setUserConfigState })))
+  const { disableButtons, saveData, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, saveData: x.saveData, setWindowState: x.setWindowState })))
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   return (
     <AnimatedSection id="ConfigScreen" condition={active} {...animate({ opacity: true })} className="absolute! z-3 h-full max-h-full w-full max-w-full bg-black/90 p-8 backdrop-blur-lg">

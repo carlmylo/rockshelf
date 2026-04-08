@@ -2,14 +2,11 @@ import { CloseIcon, FolderWithPlusIcon, LoadingIcon, MaximizeIcon, MinimizeIcon,
 import { animate, AnimatedDiv } from '@renderer/lib.exports'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
+import { useShallow } from 'zustand/shallow'
 
 export function Topbar() {
   const { t } = useTranslation()
-
-  const isWinMaximized = useWindowState((x) => x.isWinMaximized)
-  const disableTopbarButtons = useWindowState((x) => x.disableTopbarButtons)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const setWindowState = useWindowState((x) => x.setWindowState)
+  const { disableButtons, setWindowState, isWinMaximized, disableTopbarButtons } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState, isWinMaximized: x.isWinMaximized, disableTopbarButtons: x.disableTopbarButtons })))
 
   return (
     <header id="Topbar" className="laptop-lg:max-h-[4%] laptop-lg:min-h-[4%] max-h-[5%] min-h-[5%] w-full flex-row! items-center bg-[#1c1c1c] pl-4">

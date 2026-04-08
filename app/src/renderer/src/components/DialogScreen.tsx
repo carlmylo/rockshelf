@@ -1,13 +1,16 @@
-import { animate, AnimatedSection } from '@renderer/lib.exports'
+import { animate, AnimatedDiv, AnimatedSection } from '@renderer/lib.exports'
 import { useDialogScreenState } from './DialogScreen.state'
 import { useTranslation } from 'react-i18next'
 import { ButtonHTMLAttributes } from 'react'
 import clsx from 'clsx'
 import { useWindowState } from '@renderer/stores/Window.state'
+import { LoadingIcon } from '@renderer/assets/icons'
+import { useShallow } from 'zustand/shallow'
+import { useMessageBoxState } from './MessageBox.state'
 
 function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button className={clsx('rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900', className)} {...props}>
+    <button className={clsx('mr-2 rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! uppercase duration-100 last:mr-0 hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-700 disabled:hover:bg-neutral-900', className)} {...props}>
       {children}
     </button>
   )
@@ -15,26 +18,40 @@ function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HT
 
 export function DialogScreen() {
   const { t } = useTranslation()
-  const active = useDialogScreenState((x) => x.active)
-  const setDialogScreenState = useDialogScreenState((x) => x.setDialogScreenState)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const packages = useWindowState((x) => x.packages)
-  const setWindowState = useWindowState((x) => x.setWindowState)
+  const { active, deletePackageIndex, isLoadingAction, setDialogScreenState, resetDialogScreenState } = useDialogScreenState(useShallow((x) => ({ active: x.active, deletePackageIndex: x.deletePackageIndex, isLoadingAction: x.isLoadingAction, setDialogScreenState: x.setDialogScreenState, resetDialogScreenState: x.resetDialogScreenState })))
+  const { disableButtons, packages, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, packages: x.packages, setWindowState: x.setWindowState })))
+  const { setMessageBoxState } = useMessageBoxState(useShallow((x) => ({ setMessageBoxState: x.setMessageBoxState })))
 
   return (
     <AnimatedSection id="DialogScreen" condition={active !== null} {...animate({ opacity: true })} className="absolute! z-100 h-full w-full items-center justify-center bg-black/90 p-16 backdrop-blur-lg">
       {active !== null && (
         <>
           <h1 className="mb-2 text-center text-[2rem] uppercase">{t(`${active}Title`)}</h1>
-          <p className="text-center">{t(`${active}Text`)}</p>
+          <p className="text-center">
+            {t(
+              // Is confirmDeletePackage
+              active === 'confirmDeletePackage' && deletePackageIndex > -1 && typeof packages === 'object' && packages && deletePackageIndex in packages.packages
+                ? `${active}Text${packages.packages![deletePackageIndex].songsCount === 1 ? '' : 'Plural'}`
+                : // Else
+                  `${active}Text`,
+
+              // Is confirmDeletePackage
+              active === 'confirmDeletePackage' && deletePackageIndex > -1 && typeof packages === 'object' && packages && deletePackageIndex in packages.packages
+                ? { pkgName: packages.packages![deletePackageIndex].packageData.packageName, songsCount: packages.packages![deletePackageIndex].songsCount }
+                : // Else
+                  {}
+            )}
+          </p>
         </>
       )}
       <div className="mt-8 flex-row! items-center">
         {(() => {
-          if (active?.startsWith('corruptedUserConfig')) {
+          if (!active) return null
+          if (active === 'corruptedUserConfig') {
             return (
               <DialogButton
                 onClick={async () => {
+                  setDialogScreenState({ isLoadingAction: true })
                   setWindowState({ disableButtons: true })
                   try {
                     await window.api.deleteUserConfigAndRestart()
@@ -47,14 +64,15 @@ export function DialogScreen() {
                 {t('deleteUserConfigData')}
               </DialogButton>
             )
-          } else if (active?.startsWith('corruptedPackagesCache')) {
+          } else if (active === 'corruptedPackagesCache') {
             return (
               <DialogButton
                 onClick={async () => {
+                  setDialogScreenState({ isLoadingAction: true })
                   setWindowState({ disableButtons: true })
                   try {
                     const newPackagesData = await window.api.rpcs3GetPackagesData(true)
-                    setDialogScreenState({ active: null })
+                    resetDialogScreenState()
                     setWindowState({ packages: newPackagesData, disableButtons: false })
                   } catch (err) {
                     if (err instanceof Error) setWindowState({ err })
@@ -65,7 +83,7 @@ export function DialogScreen() {
                 {t('recreatePackagesCacheFile')}
               </DialogButton>
             )
-          } else if (active?.startsWith('parsingErrorsOnPackagesDTA')) {
+          } else if (active === 'parsingErrorsOnPackagesDTA') {
             return (
               <div className="items-center">
                 {typeof packages === 'object' && (
@@ -84,7 +102,7 @@ export function DialogScreen() {
                 <div className="mt-4 flex-row! items-center">
                   <DialogButton
                     onClick={async () => {
-                      setDialogScreenState({ active: null })
+                      resetDialogScreenState()
                     }}
                     disabled={disableButtons}
                   >
@@ -93,9 +111,42 @@ export function DialogScreen() {
                 </div>
               </div>
             )
+          } else if (active === 'confirmDeletePackage' && deletePackageIndex > -1 && typeof packages === 'object' && packages && deletePackageIndex in packages.packages) {
+            // const pkg = packages.packages[deletePackageIndex]
+            return (
+              <>
+                <DialogButton
+                  onClick={async () => {
+                    try {
+                      const newPackages = await window.api.deletePackage(deletePackageIndex)
+                      setWindowState({ packages: newPackages })
+                      setMessageBoxState({ message: { type: 'success', method: 'deletePackage', code: '' } })
+                      resetDialogScreenState()
+                    } catch (err) {
+                      if (err instanceof Error) setWindowState({ err })
+                    }
+                  }}
+                  disabled={disableButtons}
+                >
+                  {t('yes')}
+                </DialogButton>
+                <DialogButton
+                  onClick={async () => {
+                    resetDialogScreenState()
+                  }}
+                  disabled={disableButtons}
+                >
+                  {t('no')}
+                </DialogButton>
+              </>
+            )
           } else return null
         })()}
       </div>
+      <AnimatedDiv condition={isLoadingAction} {...animate({ opacity: true, height: true, scaleY: true })} className="origin-top">
+        <div className="h-2 w-full" />
+        <LoadingIcon className="animate-spin text-xl" />
+      </AnimatedDiv>
     </AnimatedSection>
   )
 }

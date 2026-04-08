@@ -9,19 +9,13 @@ import { useMessageBoxState } from './MessageBox.state'
 import { LoadingIcon } from '@renderer/assets/icons'
 import { useEffect, useMemo } from 'react'
 import { GitHubCommitCompare, GitHubCommitResponse } from '@renderer/app/types'
+import { useShallow } from 'zustand/shallow'
 
 export function DeluxeInstallScreen() {
   const { t } = useTranslation()
-  const active = useDeluxeInstallScreenState((x) => x.active)
-  const setDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.setDeluxeInstallScreenState)
-  const selectedPKG = useDeluxeInstallScreenState((x) => x.selectedPKG)
-  const resetDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.resetDeluxeInstallScreenState)
-  const commitData = useDeluxeInstallScreenState((x) => x.commitData)
-  const aheadCommitData = useDeluxeInstallScreenState((x) => x.aheadCommitData)
-  const setWindowState = useWindowState((x) => x.setWindowState)
+  const { active, setDeluxeInstallScreenState, selectedPKG, resetDeluxeInstallScreenState, commitData, aheadCommitData } = useDeluxeInstallScreenState(useShallow((x) => ({ active: x.active, setDeluxeInstallScreenState: x.setDeluxeInstallScreenState, selectedPKG: x.selectedPKG, resetDeluxeInstallScreenState: x.resetDeluxeInstallScreenState, commitData: x.commitData, aheadCommitData: x.aheadCommitData })))
+  const { disableButtons, rb3Stats, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, rb3Stats: x.rb3Stats, setWindowState: x.setWindowState })))
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const rb3Stats = useWindowState((x) => x.rb3Stats)
 
   const mustFetchCommitData = useMemo(() => selectedPKG !== null && selectedPKG !== 'loading', [selectedPKG])
   const selDXVerEqualFromInstalledDXVer = useMemo(() => typeof rb3Stats === 'object' && typeof selectedPKG === 'object' && selectedPKG !== null && rb3Stats.deluxeVersionHash === selectedPKG.dxHash, [rb3Stats, selectedPKG])

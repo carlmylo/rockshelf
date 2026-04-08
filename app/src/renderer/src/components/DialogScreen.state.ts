@@ -1,7 +1,11 @@
+import type { DialogScreenPromptsTypes } from 'rockshelf-core'
 import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
 export interface DialogScreenStateProps {
-  active: string | null
+  deletePackageIndex: number
+  active: DialogScreenPromptsTypes | null
+  isLoadingAction: boolean
 }
 
 export interface DialogScreenStateActions {
@@ -26,26 +30,30 @@ export interface DialogScreenStateActions {
 export type DialogScreenStateHook = DialogScreenStateProps & DialogScreenStateActions
 
 const defaultState: DialogScreenStateProps = {
+  deletePackageIndex: -1,
   active: null,
+  isLoadingAction: false,
 }
 
-export const useDialogScreenState = create<DialogScreenStateHook>()((set, get) => ({
-  ...defaultState,
-  setDialogScreenState(state) {
-    if (typeof state === 'function') return set((s) => state(s))
-    return set(() => state)
-  },
-  getDialogScreenState() {
-    const state = get()
-    const map = new Map<keyof DialogScreenStateProps, unknown>()
-    for (const key of Object.keys(state)) {
-      if (typeof state[key] === 'function') continue
-      else map.set(key as keyof DialogScreenStateProps, state[key])
-    }
+export const useDialogScreenState = create<DialogScreenStateHook>()(
+  immer((set, get) => ({
+    ...defaultState,
+    setDialogScreenState(state) {
+      if (typeof state === 'function') return set((s) => state(s))
+      return set(() => state)
+    },
+    getDialogScreenState() {
+      const state = get()
+      const map = new Map<keyof DialogScreenStateProps, unknown>()
+      for (const key of Object.keys(state)) {
+        if (typeof state[key] === 'function') continue
+        else map.set(key as keyof DialogScreenStateProps, state[key])
+      }
 
-    return Object.fromEntries(map.entries()) as Record<keyof DialogScreenStateProps, unknown> as DialogScreenStateProps
-  },
-  resetDialogScreenState() {
-    return set(() => defaultState)
-  },
-}))
+      return Object.fromEntries(map.entries()) as Record<keyof DialogScreenStateProps, unknown> as DialogScreenStateProps
+    },
+    resetDialogScreenState() {
+      return set(() => defaultState)
+    },
+  }))
+)

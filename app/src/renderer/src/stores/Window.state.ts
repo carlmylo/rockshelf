@@ -1,7 +1,8 @@
 import { ParsedRB3SaveData, InstrumentScoreData } from 'rbtools'
 import { RockBand3Data } from 'rbtools/lib'
 import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
-import { create } from 'zustand'
+import { create, StoreApi, UseBoundStore } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
 export interface WindowStateProps {
   /**
@@ -55,23 +56,25 @@ const defaultState: WindowStateProps = {
   packages: false,
 }
 
-export const useWindowState = create<WindowStateHook>()((set, get) => ({
-  ...defaultState,
-  setWindowState(state) {
-    if (typeof state === 'function') return set((s) => state(s))
-    return set(() => state)
-  },
-  getWindowState() {
-    const state = get()
-    const map = new Map<keyof WindowStateProps, unknown>()
-    for (const key of Object.keys(state)) {
-      if (typeof state[key] === 'function') continue
-      else map.set(key as keyof WindowStateProps, state[key])
-    }
+export const useWindowState: UseBoundStore<StoreApi<WindowStateHook>> = create<WindowStateHook>()(
+  immer((set, get) => ({
+    ...defaultState,
+    setWindowState(state) {
+      if (typeof state === 'function') return set((s) => state(s))
+      return set(() => state)
+    },
+    getWindowState() {
+      const state = get()
+      const map = new Map<keyof WindowStateProps, unknown>()
+      for (const key of Object.keys(state)) {
+        if (typeof state[key] === 'function') continue
+        else map.set(key as keyof WindowStateProps, state[key])
+      }
 
-    return Object.fromEntries(map.entries()) as Record<keyof WindowStateProps, unknown> as WindowStateProps
-  },
-  resetWindowState() {
-    return set(() => defaultState)
-  },
-}))
+      return Object.fromEntries(map.entries()) as Record<keyof WindowStateProps, unknown> as WindowStateProps
+    },
+    resetWindowState() {
+      return set(() => defaultState)
+    },
+  }))
+)

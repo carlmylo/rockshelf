@@ -4,13 +4,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { ErrorIcon, LoadingIcon, SuccessIcon } from '@renderer/assets/icons'
 import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
+import { useShallow } from 'zustand/shallow'
 
 export function MessageBox() {
   const { t } = useTranslation()
-  const message = useMessageBoxState((x) => x.message)
-  const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
+  const { message, setMessageBoxState, timeout } = useMessageBoxState(useShallow((x) => ({ message: x.message, setMessageBoxState: x.setMessageBoxState, timeout: x.timeout })))
   const active = useMemo(() => message !== null, [message])
-  const timeout = useMessageBoxState((x) => x.timeout)
 
   const i18nKey = useMemo(() => mountMessageBoxLocaleKey(message), [message])
 

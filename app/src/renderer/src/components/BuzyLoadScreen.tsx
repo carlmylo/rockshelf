@@ -6,15 +6,11 @@ import { useTranslation } from 'react-i18next'
 import { CheckedCircleIcon, ErrorIcon, LoadingIcon } from '@renderer/assets/icons'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
+import { useShallow } from 'zustand/shallow'
 
 export function BuzyLoadScreen() {
   const { t } = useTranslation()
-  const active = useBuzyLoadScreenState((x) => x.active)
-  const step = useBuzyLoadScreenState((x) => x.step)
-  const isCompleted = useBuzyLoadScreenState((x) => x.isCompleted)
-  const hasError = useBuzyLoadScreenState((x) => x.hasError)
-  const setBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.setBuzyLoadScreenState)
-  const resetBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.resetBuzyLoadScreenState)
+  const { active, hasError, isCompleted, resetBuzyLoadScreenState, setBuzyLoadScreenState, step } = useBuzyLoadScreenState(useShallow((x) => ({ active: x.active, step: x.step, isCompleted: x.isCompleted, hasError: x.hasError, setBuzyLoadScreenState: x.setBuzyLoadScreenState, resetBuzyLoadScreenState: x.resetBuzyLoadScreenState })))
   const setWindowState = useWindowState((x) => x.setWindowState)
   const resetDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.resetDeluxeInstallScreenState)
 

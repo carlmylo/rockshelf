@@ -7,8 +7,8 @@ export function FatalErrorScreen() {
   const condition = useMemo(() => err !== null, [err])
   return (
     <AnimatedSection id="ErrorScreen" condition={condition} className="absolute! z-1000 h-full w-full items-center justify-center bg-neutral-950">
-      <h1 className='mb-4'>FATAL ERROR</h1>
-      {condition && <p className='text-center'>{err?.stack}</p>}
+      <h1 className="mb-4">FATAL ERROR</h1>
+      {condition && <p className="p-2 text-center text-xl">{err?.stack}</p>}
     </AnimatedSection>
   )
 }

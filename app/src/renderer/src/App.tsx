@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, InstallPKGScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, Topbar, WindowFrame } from './components.exports'
+import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, InstallPKGScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, SongDetails, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +18,7 @@ export function App() {
   const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
   const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
-  const setDialogScreenState = useDialogScreenState((x) => x.setDialogScreenState)
+  const { setDialogScreenState } = useDialogScreenState.getState()
   const setBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.setBuzyLoadScreenState)
 
   useEffect(function initApp() {
@@ -140,6 +140,7 @@ export function App() {
         <MainScreen />
         <MessageBox />
         <MyPackagesScreen />
+        <SongDetails />
       </WindowFrame>
     </>
   )

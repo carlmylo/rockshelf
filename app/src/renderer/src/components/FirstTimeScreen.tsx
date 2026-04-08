@@ -8,15 +8,13 @@ import { ARGFlag, BOLFlag, BRAFlag, COLFlag, MEXFlag, PARYFlag, PERUFlag, URUFla
 import { RPCS3SongPackagesDataExtra, UserConfigObject } from 'rockshelf-core'
 import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './LogoScreen.state'
+import { useShallow } from 'zustand/shallow'
 
 export function FirstTimeScreen() {
   const { i18n, t } = useTranslation()
   const active = useFirstTimeScreenState((x) => x.active)
-  const devhdd0Path = useUserConfigState((x) => x.devhdd0Path)
-  const rpcs3ExePath = useUserConfigState((x) => x.rpcs3ExePath)
-  const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
-  const disableButtons = useWindowState((x) => x.disableButtons)
-  const setWindowState = useWindowState((x) => x.setWindowState)
+  const { devhdd0Path, rpcs3ExePath, setUserConfigState } = useUserConfigState(useShallow((x) => ({ devhdd0Path: x.devhdd0Path, rpcs3ExePath: x.rpcs3ExePath, setUserConfigState: x.setUserConfigState })))
+  const { disableButtons, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState })))
   const setFirstTimeScreenState = useFirstTimeScreenState((x) => x.setFirstTimeScreenState)
   const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
 

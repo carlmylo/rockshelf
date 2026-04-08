@@ -31,7 +31,7 @@ export const appES419Locale = {
   loadingCommitInfo: 'Cargando información del commit...',
   loadingPackagesData: 'Cargando datos de paquetes instalados...',
   loadingRB3Data: 'Cargando información de Rock Band 3...',
-  loadingRockshelf: 'Cargando Rockshelf...',
+  loadingRockshelf: 'Cargando Rockshelf',
   myPackages: 'Mi Pacotas',
   notUpdatedRB3DXInfo: '{{behindBy}} commit detrás del commit más reciente de Rock Band 3 Deluxe.',
   notUpdatedRB3DXInfoPlural: '{{behindBy}} commits detrás del commit más reciente de Rock Band 3 Deluxe.',
