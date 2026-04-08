@@ -17,7 +17,19 @@
 </div>
 
 - [About](#about)
+- [Special Thanks](#special-thanks)
 
 # About
 
 Rockshelf is a Rock Band 3 utility suite for RPCS3 users built with [Electron Vite](https://electron-vite.org/) framework. Rockshelf comes with a hand-made `core` package that features the main [NodeJS](https://nodejs.org/en) process and methods, as well as the Rockshelf preload script, and uses [ReactJS](https://react.dev/) as a renderer framework.
+
+# Special Thanks
+
+- [Carl Mylo](https://github.com/carlmylo)
+- [Rahpael Goulart](https://github.com/raphaelgoulart)
+- [TrojanNemo](https://github.com/trojannemo)
+- [Jnack](https://github.com/jnackmclain)
+- [Aloquendiar](https://github.com/Aloquendiar)
+- [Emma](https://github.com/InvoxiPlayGames)
+- [LocalH](https://github.com/LocalH)
+- [Onyxite](https://github.com/mtolly)
