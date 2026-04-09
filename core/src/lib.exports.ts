@@ -1,5 +1,3 @@
-export * from './lib/dta/catalogDTA'
-
 export * from './lib/exec/BinaryAPI'
 
 export * from './lib/pkg/installRB3PatchFromPKG'

@@ -1,10 +1,10 @@
-import { DTACatalogByGenreObject, DTACatalogTypes, type DTACatalogByTitleObject } from 'rockshelf-core'
+import type { DTACatalogGenericObject, DTACatalogByArtistObject, DTACatalogByDifficultyObject, DTACatalogTypes } from 'rbtools/lib'
 import { create } from 'zustand'
 
 export interface MyPackagesScreenStateProps {
   active: boolean
   selPKG: number
-  catalog: DTACatalogByTitleObject | DTACatalogByGenreObject | false | 'loading'
+  catalog: DTACatalogGenericObject | DTACatalogByArtistObject | DTACatalogByDifficultyObject | false | 'loading'
   catalogSortBy: DTACatalogTypes
   packageDetailsTab: number
   hoveredPKG: number

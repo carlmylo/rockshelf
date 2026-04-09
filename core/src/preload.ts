@@ -4,9 +4,9 @@ import type { Promisable } from 'type-fest'
 import type { openUserDataFolder, readUserConfigFile, MessageBoxObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize, BuzyLoadInitObject, BuzyLoadScreenSenderObject, BuzyLoadErrorObject, DialogScreenPromptsTypes } from './core.exports'
 import type { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, getDTACatalog, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectDevhdd0Dir, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig } from './controllers.exports'
 import type { ParsedRB3SaveData } from 'rbtools'
-import type { DTACatalogTypes, RPCS3SongPackagesObjectExtra } from './lib.exports'
+import type { RPCS3SongPackagesObjectExtra } from './lib.exports'
 import type { FatalErrorObject } from './lib/senders/fatalError'
-import type { RB3CompatibleDTAFile } from 'rbtools/lib'
+import type { DTACatalogOptions, DTACatalogTypes, RB3CompatibleDTAFile } from 'rbtools/lib'
 
 const invoke = ipcRenderer.invoke.bind(ipcRenderer)
 const on = ipcRenderer.on.bind(ipcRenderer)
@@ -111,7 +111,7 @@ export const rockshelfAPI = {
 
   deletePackageThumbnails: async (): ReturnType<typeof deletePackageThumbnails> => await invoke('deletePackageThumbnails'),
   deleteUserConfigAndRestart: async (): ReturnType<typeof deleteUserConfigAndRestart> => await invoke('deleteUserConfigAndRestart'),
-  getDTACatalog: async (selectedIndex: number, type?: DTACatalogTypes): ReturnType<typeof getDTACatalog> => await invoke('getDTACatalog', selectedIndex, type),
+  getDTACatalog: async (selectedIndex: number, type?: DTACatalogTypes, options?: DTACatalogOptions): ReturnType<typeof getDTACatalog> => await invoke('getDTACatalog', selectedIndex, type, options),
   getSongArtworkDataURL: async (packageDetails: RPCS3SongPackagesObjectExtra, songDetails: RB3CompatibleDTAFile): ReturnType<typeof getSongArtworkDataURL> => await invoke('getSongArtworkDataURL', packageDetails, songDetails),
   installHighMemoryPatch: async (): ReturnType<typeof installHighMemoryPatch> => await invoke('installHighMemoryPatch'),
   installPKGFile: async (selectedPKG: SelectPKGFileReturnObject): ReturnType<typeof installPKGFile> => await invoke('installPKGFile', selectedPKG),

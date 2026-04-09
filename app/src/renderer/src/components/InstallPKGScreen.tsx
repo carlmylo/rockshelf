@@ -44,7 +44,7 @@ export function InstallPKGScreen() {
                 <h1 className="mb-0.5 text-xs text-gray-400 uppercase">{t('pkgSize')}</h1>
                 <p className="mb-4 font-mono text-xs">{getReadableBytesSize(selectedPKG.pkgSize)}</p>
                 <h1 className="mb-0.5 text-xs text-gray-400 uppercase">{t('packageFolderName')}</h1>
-                <p className='mb-2'>{t('packageFolderNameDesc')}</p>
+                <p className="mb-2">{t('packageFolderNameDesc')}</p>
                 <input className="h-7 rounded-xs bg-neutral-900 px-2" value={packageFolderName} onChange={(ev) => setInstallPKGScreenState({ packageFolderName: ev.target.value })} />
                 {/* <p>{JSON.stringify(selectedPKG.stat, null, 4)}</p> */}
               </div>
