@@ -7,10 +7,10 @@ import { randomByteFromRanges } from 'node-lib'
  * @param {BrowserWindow} win Target `BrowserWindow` that will receive the message.
  * @param {string} key The key of the locale value.
  */
-export const getLocaleStringFromRenderer = (win: BrowserWindow, key: string): Promise<string> => {
+export const getLocaleStringFromRenderer = (win: BrowserWindow, key: string, messageValues?: Record<string, string | number>): Promise<string> => {
   const uuid = randomByteFromRanges(16).toString('hex')
   return new Promise<string>((resolve, _) => {
     ipcMain.once(`sendLocale/${uuid}`, (_, text: string) => resolve(text))
-    win.webContents.send('getLocaleStringFromRenderer', uuid, key)
+    win.webContents.send('getLocaleStringFromRenderer', uuid, key, messageValues)
   })
 }

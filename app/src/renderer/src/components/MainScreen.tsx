@@ -17,7 +17,7 @@ import { useShallow } from 'zustand/shallow'
 export function MainScreen() {
   const { t } = useTranslation()
   const active = useMainScreenState((x) => x.active)
-  const { disableButtons, saveData, setWindowState, rb3Stats, instrumentScores, packages } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, saveData: x.saveData, setWindowState: x.setWindowState, rb3Stats: x.rb3Stats, instrumentScores: x.instrumentScores, packages: x.packages })))
+  const { disableButtons, saveData, setWindowState, rb3Stats, instrumentScores, packages, richPresence } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, saveData: x.saveData, setWindowState: x.setWindowState, rb3Stats: x.rb3Stats, instrumentScores: x.instrumentScores, packages: x.packages, richPresence: x.richPresence })))
   const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
   const setDeluxeInstallScreenState = useDeluxeInstallScreenState((x) => x.setDeluxeInstallScreenState)
   const setConfigScreenState = useConfigScreenState((x) => x.setConfigScreenState)
@@ -111,6 +111,45 @@ export function MainScreen() {
             <>
               <div className="mr-4 h-48 max-h-48 w-48 max-w-48">
                 <img src={`rbicons://${rb3Stats.hasDeluxe ? 'dx' : 'rb3'}`} className={clsx(!rb3Stats.hasGameInstalled && 'grayscale', 'mr-4 mb-2 h-48 min-h-48 w-48 min-w-48 duration-200')} />
+
+                <button
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  disabled={disableButtons}
+                  onClick={async () => {
+                    setWindowState({ disableButtons: true })
+                    await window.api.playRockBand3()
+                    setWindowState({ disableButtons: false })
+                  }}
+                >
+                  {t(`play${rb3Stats.hasDeluxe ? 'DX' : 'RB3'}`)}
+                </button>
+                <button
+                  className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                  disabled={disableButtons}
+                  onClick={async () => {
+                    setWindowState({ disableButtons: true })
+                    if (richPresence) {
+                      const rpDestroySuccess = await window.api.discordRPDestroy()
+                      if (!rpDestroySuccess) {
+                        setWindowState({ disableButtons: false, richPresence: true })
+                        return
+                      }
+                      setWindowState({ disableButtons: false, richPresence: false })
+                      setMessageBoxState({ message: { type: 'info', method: 'discordRP', code: 'stopped' } })
+                      return
+                    }
+                    const rpStartSuccess = await window.api.discordRPStart()
+                    if (!rpStartSuccess) {
+                      setWindowState({ disableButtons: false, richPresence: false })
+                      return
+                    }
+                    setWindowState({ disableButtons: false, richPresence: true })
+                    setMessageBoxState({ message: { type: 'info', method: 'discordRP', code: 'started' } })
+                    return
+                  }}
+                >
+                  {richPresence ? t('stopRichPresence') : t('startRichPresence')}
+                </button>
                 <button
                   className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
                   disabled={disableButtons}
@@ -120,7 +159,7 @@ export function MainScreen() {
                 >
                   {t('installDeluxe')}
                 </button>
-                <button
+                {/* <button
                   className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
                   disabled={disableButtons}
                   onClick={async () => {
@@ -141,7 +180,7 @@ export function MainScreen() {
                   }}
                 >
                   {t('installPackage')}
-                </button>
+                </button> */}
                 {/* <button
                   className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
                   disabled={disableButtons}

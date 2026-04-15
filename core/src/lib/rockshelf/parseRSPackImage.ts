@@ -23,7 +23,7 @@ const installationSourceMap = {
 export type RSPackImageInstallationSourceNumbers = keyof typeof installationSourceMap
 export type RSPackImageInstallationSourceValues = (typeof installationSourceMap)[keyof typeof installationSourceMap]
 
-export interface RSPackImageV1Object {
+export interface ParsedRSPackImageObject {
   /**
    * The version of the Rockshelf Pack Image. This is used internally to switch between different parser methods based on the version of the file.
    */
@@ -34,11 +34,11 @@ export interface RSPackImageV1Object {
    * - `"rockshelf"`: Installed through Rockshelf itself.
    * - `"other"`: Installed through other program (probably Onyx).
    */
-  installationType?: RSPackImageInstallationTypeValues
+  installationType: RSPackImageInstallationTypeValues
   /**
    * The installation source of the song package.
    */
-  installationSrc?: RSPackImageInstallationSourceValues
+  installationSrc: RSPackImageInstallationSourceValues
   /**
    * The display name of the song package on Rockshelf.
    */
@@ -50,7 +50,7 @@ export interface RSPackImageV1Object {
  * @param {FilePathLikeTypes} srcPath The path to the JPEG image to be evaluated.
  * @returns {Promise<[RSPackImageFileVersionNumbers, Buffer] | undefined>}
  */
-export const isJPEGRockshelfPackImage = async (srcPath: FilePathLikeTypes): Promise<[RSPackImageFileVersionNumbers, Buffer] | undefined> => {
+export const isJPEGRockshelfPackImage = async (srcPath: FilePathLikeTypes): Promise<{ fileVersion: RSPackImageFileVersionNumbers; buffer: Buffer; footerSizeLength: number } | undefined> => {
   const src = pathLikeToFilePath(srcPath)
   const reader = await src.openReader()
   const imageFileSize = reader.length
@@ -67,24 +67,28 @@ export const isJPEGRockshelfPackImage = async (srcPath: FilePathLikeTypes): Prom
     return
   }
   const fileVersion = (await reader.readUInt8()) as RSPackImageFileVersionNumbers
-  const rsdatBuffer = await reader.read()
+  const buffer = await reader.read()
   await reader.close()
-  return [fileVersion, rsdatBuffer]
+  return {
+    fileVersion,
+    buffer,
+    footerSizeLength,
+  }
 }
 
 /**
  * Parses a version 1 Rockshelf Pack Image footer `Buffer` object.
  * - - - -
  * @param {Buffer} rsdatBuffer The footer bytes of a Rockshelf Pack Image as `Buffer`.
- * @returns {Promise<RSPackImageV1Object>}
+ * @returns {Promise<ParsedRSPackImageObject>}
  */
-export const parseRSDATBufferV1 = async (rsdatBuffer: Buffer): Promise<RSPackImageV1Object> => {
+export const parseRSDATBuffer = async (rsdatBuffer: Buffer): Promise<ParsedRSPackImageObject> => {
   const reader = BinaryReader.fromBuffer(rsdatBuffer)
   const installationType = (await reader.readUInt8()) as RSPackImageInstallationTypeNumbers
   const installationSrc = (await reader.readUInt8()) as RSPackImageInstallationSourceNumbers
 
   reader.padding(14)
-  
+
   const packageNameLength = await reader.readUInt8()
   const packageName = await reader.readUTF8(packageNameLength)
 
@@ -100,18 +104,18 @@ export const parseRSDATBufferV1 = async (rsdatBuffer: Buffer): Promise<RSPackIma
  * Parses a Rockshelf Pack Image file.
  * - - - -
  * @param {FilePathLikeTypes} srcPath The path to the JPEG image to be parsed.
- * @returns {Promise<RSPackImageV1Object>}
+ * @returns {Promise<ParsedRSPackImageObject>}
  * @throws {Error} If the provided JPEG image file is not a valid Rockshelf Pack Image file.
  */
-export const parseRSPackImageFile = async (srcPath: FilePathLikeTypes): Promise<RSPackImageV1Object> => {
+export const parseRSPackImageFile = async (srcPath: FilePathLikeTypes): Promise<ParsedRSPackImageObject> => {
   const src = pathLikeToFilePath(srcPath)
   const results = await isJPEGRockshelfPackImage(srcPath)
   if (!results) throw new Error(`Provided JPEG image file "${src.path}" is not a valid Rockshelf Pack Image file.`)
-  const [fileVersion, rsdatBuffer] = results
+  const { buffer, fileVersion } = results
 
   switch (fileVersion) {
     case 1:
     default:
-      return await parseRSDATBufferV1(rsdatBuffer)
+      return await parseRSDATBuffer(buffer)
   }
 }

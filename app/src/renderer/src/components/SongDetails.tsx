@@ -43,9 +43,6 @@ export function SongDetails() {
       {songDetails !== null && (
         <>
           <div className="mb-2 flex-row! items-start border-b border-white/25 pb-2">
-            {/* {isArtworkLoading ? () : (
-              <img src={packageDetails?.official?.code === 'rb3' ? `rb3art://${songDetails.songname}` : undefined} className="mr-2 h-32 min-h-32 w-32 min-w-32" />
-            )} */}
             <div className={clsx('mr-2 h-32 min-h-32 w-32 min-w-32', isArtworkLoading && 'border border-neutral-800')}>
               <AnimatedDiv condition={isArtworkLoading} className="absolute! h-full w-full items-center justify-center bg-black/95 backdrop-blur-lg">
                 <LoadingIcon className="animate-spin text-xl" style={{ animationTimingFunction: '0.1s !important' }} />

@@ -32,10 +32,11 @@ export const rpcs3GetPackagesData = useHandler(async (win, _, forceUpdate: boole
   // 7 days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000 milliseconds/second
   const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000
 
-  if (stat.mtime.getTime() - new Date().getTime() > oneWeekInMilliseconds) forceCacheUpdate = true
+  if (new Date().getTime() - stat.mtime.getTime() > oneWeekInMilliseconds) forceCacheUpdate = true
 
   if (!forceCacheUpdate) {
     try {
+      sendMessageBox(win, { type: 'info', method: 'rpcs3GetPackagesData', code: 'readingFromCache' })
       await genPackImageToAllPackages(devhdd0)
       const cacheContents = await cache.readJSON<RPCS3SongPackagesDataExtra>()
       if (typeof cacheContents !== 'object' || (typeof cacheContents === 'object' && cacheContents === null)) throw new Error(`Rockshelf's cache file returned a ${typeof cacheContents} and it's not valid.`)

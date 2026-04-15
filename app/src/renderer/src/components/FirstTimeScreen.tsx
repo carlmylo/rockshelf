@@ -9,14 +9,16 @@ import { RPCS3SongPackagesDataExtra, UserConfigObject } from 'rockshelf-core'
 import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './LogoScreen.state'
 import { useShallow } from 'zustand/shallow'
+import { useMessageBoxState } from './MessageBox.state'
 
 export function FirstTimeScreen() {
   const { i18n, t } = useTranslation()
-  const active = useFirstTimeScreenState((x) => x.active)
+  const { active } = useFirstTimeScreenState(useShallow((x) => ({ active: x.active })))
   const { devhdd0Path, rpcs3ExePath, setUserConfigState } = useUserConfigState(useShallow((x) => ({ devhdd0Path: x.devhdd0Path, rpcs3ExePath: x.rpcs3ExePath, setUserConfigState: x.setUserConfigState })))
   const { disableButtons, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState })))
-  const setFirstTimeScreenState = useFirstTimeScreenState((x) => x.setFirstTimeScreenState)
-  const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
+  const { setFirstTimeScreenState } = useFirstTimeScreenState(useShallow((x) => ({ setFirstTimeScreenState: x.setFirstTimeScreenState })))
+  const { setLogoScreenState } = useLogoScreenState(useShallow((x) => ({ setLogoScreenState: x.setLogoScreenState })))
+  const { setMessageBoxState } = useMessageBoxState(useShallow((x) => ({ setMessageBoxState: x.setMessageBoxState })))
 
   return (
     <AnimatedSection condition={active} {...animate({ opacity: true })} id="FirstTimeScreen" className="absolute! z-3 h-full w-full bg-black/90 p-8 backdrop-blur-lg">
@@ -87,6 +89,7 @@ export function FirstTimeScreen() {
         {...animate({ opacity: true, height: true, scaleY: true })}
         onClick={async () => {
           setWindowState({ disableButtons: true })
+          setMessageBoxState({ message: { type: 'loading', method: 'firstTimeData', code: '' } })
           try {
             await window.api.saveUserConfigFile({
               devhdd0Path,
@@ -120,6 +123,8 @@ export function FirstTimeScreen() {
               packages: packagesData,
               disableButtons: false,
             })
+
+            setMessageBoxState({ message: null })
             setLogoScreenState({ active: false })
             setFirstTimeScreenState({ active: false })
           } catch (err) {

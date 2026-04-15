@@ -29,6 +29,7 @@ const defaultState: UserConfigStateProps = {
   rpcs3ExePath: '',
   mostPlayedDifficulty: 3,
   mostPlayedInstrument: 'band',
+  rpcs3NoGUI: false,
 }
 
 export const useUserConfigState = create<UserConfigStateHook>()((set, get) => ({

@@ -1,17 +1,39 @@
-import { BinaryWriter, FilePath, type FilePathLikeTypes, pathLikeToFilePath, StreamWriter } from 'node-lib'
+import { BinaryReader, BinaryWriter, FilePath, type FilePathLikeTypes, pathLikeToFilePath, StreamWriter } from 'node-lib'
 import { createReadStream } from 'node:fs'
 import { useDefaultOptions } from 'use-default-options'
 
-export interface RSPackImageCreatorOptionsV1 {
+export interface RSPackImageCreatorOptions {
   installationType?: 'rockshelf' | 'other'
   installationSrc?: 'merged' | 'stfs' | 'pkg'
   packageName?: string
 }
 
-export const createRSPackImageV1 = async (imageFilePath: FilePathLikeTypes, destPath: FilePathLikeTypes, options?: RSPackImageCreatorOptionsV1): Promise<FilePath> => {
-  const img = pathLikeToFilePath(imageFilePath)
+export const removeRSDataFromBuffer = async (input: Buffer): Promise<Buffer> => {
+  const reader = BinaryReader.fromBuffer(input)
+  const imageFileSize = reader.length
+  reader.seek(imageFileSize - 4)
+  const footerSizeLength = await reader.readUInt32LE()
+  if (imageFileSize - footerSizeLength <= 4) {
+    await reader.close()
+    return input
+  }
+  reader.seek(imageFileSize - footerSizeLength)
+  const magic = await reader.readASCII(4)
+  if (magic !== 'RSDT') {
+    await reader.close()
+    return input
+  }
+
+  reader.seek(0)
+  return await reader.read(imageFileSize - footerSizeLength)
+}
+
+export const createRSPackImage = async (imageFilePathOrBuffer: FilePathLikeTypes | Buffer, destPath: FilePathLikeTypes, options?: RSPackImageCreatorOptions): Promise<FilePath> => {
+  let img: FilePath | Buffer
+  if (Buffer.isBuffer(imageFilePathOrBuffer)) img = await removeRSDataFromBuffer(imageFilePathOrBuffer)
+  else img = pathLikeToFilePath(imageFilePathOrBuffer)
   const dest = pathLikeToFilePath(destPath)
-  const { installationType, installationSrc, packageName } = useDefaultOptions<RSPackImageCreatorOptionsV1>(
+  const { installationType, installationSrc, packageName } = useDefaultOptions<RSPackImageCreatorOptions>(
     {
       installationType: 'rockshelf',
       installationSrc: 'stfs',
@@ -24,18 +46,23 @@ export const createRSPackImageV1 = async (imageFilePath: FilePathLikeTypes, dest
   const writer = await StreamWriter.toFile(dest)
 
   await new Promise((resolve, reject) => {
-    const srcReadStream = createReadStream(img.path)
-
-    srcReadStream.on('data', (chunk) => {
-      writer.write(chunk)
-    })
-
-    srcReadStream.on('error', (err) => reject(err))
-
-    srcReadStream.on('end', () => {
-      srcReadStream.close()
+    if (Buffer.isBuffer(img)) {
+      writer.write(img)
       resolve(null)
-    })
+    } else {
+      const srcReadStream = createReadStream(img.path)
+
+      srcReadStream.on('data', (chunk) => {
+        writer.write(chunk)
+      })
+
+      srcReadStream.on('error', (err) => reject(err))
+
+      srcReadStream.on('end', () => {
+        srcReadStream.close()
+        resolve(null)
+      })
+    }
   })
 
   const extraData = new BinaryWriter()
@@ -69,8 +96,11 @@ export const createRSPackImageV1 = async (imageFilePath: FilePathLikeTypes, dest
 
   const extraDataLength = extraData.length + 4
   extraData.writeUInt32LE(extraDataLength)
+
   writer.write(extraData.toBuffer())
+
   extraData.clearContents()
   await writer.close()
+
   return dest
 }

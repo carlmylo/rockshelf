@@ -20,6 +20,10 @@ export interface UserConfigObject {
    * The difficulty the player plays the most. Default when first saving the config file is `3` (Expert).
    */
   mostPlayedDifficulty: 0 | 1 | 2 | 3
+  /**
+   * If `true`, the RPCS3 instance launched by the application would open without GUI. Default when first saving the config file is `false`.
+   */
+  rpcs3NoGUI: boolean
 }
 
 /**
@@ -56,6 +60,7 @@ export const saveUserConfigFile = async (newConfig?: Partial<UserConfigObject>):
     rpcs3ExePath: '',
     mostPlayedInstrument: 'band',
     mostPlayedDifficulty: 3,
+    rpcs3NoGUI: false,
   }
 
   const value: UserConfigObject = {

@@ -6,11 +6,17 @@ import { useShallow } from 'zustand/shallow'
 
 export function Topbar() {
   const { t } = useTranslation()
-  const { disableButtons, setWindowState, isWinMaximized, disableTopbarButtons } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState, isWinMaximized: x.isWinMaximized, disableTopbarButtons: x.disableTopbarButtons })))
+  const { disableButtons, setWindowState, isWinMaximized, disableTopbarButtons, richPresence } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState, isWinMaximized: x.isWinMaximized, disableTopbarButtons: x.disableTopbarButtons, richPresence: x.richPresence })))
 
   return (
     <header id="Topbar" className="laptop-lg:max-h-[4%] laptop-lg:min-h-[4%] max-h-[5%] min-h-[5%] w-full flex-row! items-center bg-[#1c1c1c] pl-4">
       <p className="mr-2 font-sans text-xs">{t('appTitle')}</p>
+      {
+        <AnimatedDiv condition={richPresence} {...animate({ opacity: true })} className="mr-1 animate-pulse flex-row! items-center rounded-sm border border-cyan-900 bg-cyan-950 px-1 py-0.5">
+          <div className="mr-1 h-2 w-2 rounded-full bg-cyan-600"></div>
+          <h1 className="text-neutral-300 uppercase">{t('richPresenceOn')}</h1>
+        </AnimatedDiv>
+      }
       <AnimatedDiv {...animate({ opacity: true })} condition={disableButtons}>
         <LoadingIcon className="animate-spin" />
       </AnimatedDiv>

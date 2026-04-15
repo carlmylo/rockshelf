@@ -23,7 +23,7 @@ export const deletePackage = useHandler(async (win, __, pkgIndex: number) => {
   const pkgPath = DirPath.of(path)
 
   if (!pkgPath.exists) {
-    sendMessageBox(win, { type: 'error', method: 'deletePackage', code: 'notFound' })
+    sendMessageBox(win, { type: 'error', method: 'deletePackage', code: 'packageNotFound' })
     return false
   }
 
@@ -32,8 +32,11 @@ export const deletePackage = useHandler(async (win, __, pkgIndex: number) => {
 
   cacheContents.packages.splice(pkgIndex, 1)
 
-  cacheContents.allPackagesCount -= songsCount
+  cacheContents.allPackagesCount -= 1
   cacheContents.allPackagesSize -= packageSize
+  cacheContents.allSongsCount -= songsCount
+  cacheContents.allSongsPlusRB3 -= songsCount
+  cacheContents.starsCount -= songsCount * 5
   if (packageType === 'rb3') {
     cacheContents.rb3PackagesSongsCount -= songsCount
     cacheContents.rb3PackagesCount--

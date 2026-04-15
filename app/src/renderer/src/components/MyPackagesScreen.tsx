@@ -1,4 +1,4 @@
-import { AnimatedDiv, AnimatedP, AnimatedSection, animate } from '@renderer/lib.exports'
+import { AnimatedDiv, AnimatedP, AnimatedSection, animate, getReadableBytesSize } from '@renderer/lib.exports'
 import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
@@ -6,12 +6,11 @@ import { PackageDetails } from './PackageDetails'
 import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
 import { useDialogScreenState } from './DialogScreen.state'
 import { useShallow } from 'zustand/shallow'
-import { useCallback } from 'react'
 
 export function MyPackagesScreen() {
   const { t } = useTranslation()
   const { active, hoveredPKG, setMyPackagesScreenState, resetMyPackagesScreenState } = useMyPackagesScreenState(useShallow((x) => ({ active: x.active, hoveredPKG: x.hoveredPKG, setMyPackagesScreenState: x.setMyPackagesScreenState, resetMyPackagesScreenState: x.resetMyPackagesScreenState })))
-  const { disableButtons, packages, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, packages: x.packages, setWindowState: x.setWindowState })))
+  const { disableButtons, packages, setWindowState, disableImg } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, packages: x.packages, setWindowState: x.setWindowState, disableImg: x.disableImg })))
   const { setDialogScreenState } = useDialogScreenState(useShallow((x) => ({ setDialogScreenState: x.setDialogScreenState })))
 
   return (
@@ -19,15 +18,6 @@ export function MyPackagesScreen() {
       <AnimatedSection id="MyPackagesScreen" condition={active} {...animate({ opacity: true })} className="absolute! z-3 h-full max-h-full w-full max-w-full bg-black/90 p-8 backdrop-blur-lg">
         <div className="mb-2 flex-row! items-center border-b border-white/25 pb-1">
           <h1 className="font-pentatonicalt! mr-auto text-[2rem] uppercase">{t('myPackages')}</h1>
-          <button
-            disabled={disableButtons}
-            className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-            onClick={async () => {
-              resetMyPackagesScreenState()
-            }}
-          >
-            {t('goBack')}
-          </button>
           <button
             disabled={disableButtons}
             className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
@@ -44,6 +34,15 @@ export function MyPackagesScreen() {
             }}
           >
             {t('refresh')}
+          </button>
+          <button
+            disabled={disableButtons}
+            className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+            onClick={async () => {
+              resetMyPackagesScreenState()
+            }}
+          >
+            {t('goBack')}
           </button>
         </div>
         <div className="h-full w-full overflow-y-auto">
@@ -66,10 +65,12 @@ export function MyPackagesScreen() {
                           setWindowState({ disableButtons: false })
                         }}
                       >
-                        <img src={pkg.thumbnailSrc} className="mr-2 h-20 min-h-20 w-20 min-w-20" />
+                        <img src={disableImg === packageI ? undefined : pkg.thumbnailSrc} className="mr-2 h-20 min-h-20 w-20 min-w-20" />
                         <div className="mr-auto">
                           <h2 className="font-pentatonic text-xl">{pkg.packageData.packageName}</h2>
-                          <h3 className="mb-2 text-xs text-neutral-700 italic">{t(pkg.songs.length === 1 ? 'songCount' : 'songCountPlural', { count: pkg.songs.length })}</h3>
+                          <h3 className="mb-2 text-xs text-neutral-500 italic">
+                            {t(pkg.songs.length === 1 ? 'songCount' : 'songCountPlural', { count: pkg.songs.length })} / {getReadableBytesSize(pkg.packageSize)}
+                          </h3>
                           {pkg.official?.code !== 'rb3' && <p className="absolute! bottom-0 rounded-xs bg-neutral-950 px-2 py-0.5 font-mono text-xs whitespace-nowrap">{`${pkg.packageType === 'rb1' ? 'BLUS30050' : 'BLUS30463'}/USRDIR/${pkg.name}`}</p>}
                         </div>
                         <AnimatedDiv condition={hoveredPKG === packageI} {...animate({ opacity: true, duration: 0.1 })}>

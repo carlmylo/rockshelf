@@ -1,3 +1,1 @@
-export const installSongPackageFromPKG = async () => {
-    
-}
+export const installSongPackageFromPKG = async () => {}

@@ -1,7 +1,7 @@
 import { createHashFromBuffer, DirPath, FilePath, type DirPathLikeTypes } from 'node-lib'
 import { getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir } from '../../core.exports'
 import { getOfficialSongPackageStatsFromHash, isRPCS3Devhdd0PathValid, rpcs3GenSongPackageManifest } from 'rbtools/lib'
-import { createRSPackImageV1 } from './createRSPackImage'
+import { createRSPackImage } from './createRSPackImage'
 import { DTAParser, TextureFile } from 'rbtools'
 import { temporaryFile } from 'tempy'
 
@@ -37,14 +37,14 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
             const texture = new TextureFile(packagePath.gotoFile(`songs/${onlySong.songname}/gen/${onlySong.songname}_keep.png_ps3`))
             if (texture.path.exists) {
               const temp = await texture.convertToImage(temporaryFile({ extension: '.jpg' }), 'jpg')
-              await createRSPackImageV1(temp.path, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: `${onlySong.name} - ${onlySong.artist}` })
+              await createRSPackImage(temp.path, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: `${onlySong.name} - ${onlySong.artist}` })
               await temp.path.delete()
               return
             }
           }
           let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
           if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
-          await createRSPackImageV1(newPackageImage, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: official?.name || packagePath.name })
+          await createRSPackImage(newPackageImage, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: official?.name || packagePath.name })
         }
       }
     }
@@ -82,14 +82,14 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
               const texture = new TextureFile(packagePath.gotoFile(`songs/${onlySong.songname}/gen/${onlySong.songname}_keep.png_ps3`))
               if (texture.path.exists) {
                 const temp = await texture.convertToImage(temporaryFile({ extension: '.jpg' }), 'jpg')
-                await createRSPackImageV1(temp.path, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: `${onlySong.name} - ${onlySong.artist}` })
+                await createRSPackImage(temp.path, thumbnailSrc, { installationSrc: 'pkg', installationType: 'other', packageName: `${onlySong.name} - ${onlySong.artist}` })
                 await temp.path.delete()
                 return
               }
             }
             let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
             if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
-            await createRSPackImageV1(newPackageImage, thumbnailSrc, { installationSrc: 'merged', installationType: 'other', packageName: official?.name ?? packagePath.name })
+            await createRSPackImage(newPackageImage, thumbnailSrc, { installationSrc: 'pkg', installationType: 'other', packageName: official?.name ?? packagePath.name })
           }
         }
       }

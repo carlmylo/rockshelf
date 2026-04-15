@@ -1,7 +1,7 @@
-import { app, BrowserWindow, protocol, net } from 'electron'
+import { app, BrowserWindow, protocol, net, ipcMain } from 'electron'
 import { pathToFileURL } from 'node:url'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { checkDeps, createWindow, getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
+import { checkDeps, createWindow, getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir, initRichPresence, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
 import { initMainProcessHandlers } from './initMainProcessHandlers'
 
 export async function initRockshelfMainProcess(options: CreateWindowOptions): Promise<void> {
@@ -16,21 +16,26 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
 
   await app.whenReady()
 
-  protocol.handle('rbicons', (request) => {
+  protocol.handle('rbicons', async (request) => {
     const root = getRockshelfModuleRootDir()
     const code = request.url.slice('rbicons://'.length)
     const name = code === 'songPackage' ? 'custom' : code
     let filePath = root.gotoFile(`bin/icons/${name}.webp`)
     if (!filePath.exists) filePath = root.gotoFile(`bin/icons/custom.webp`)
 
-    return net.fetch(pathToFileURL(filePath.path).toString())
+    if (!filePath.exists) return new Response(null)
+
+    const fileBuffer = await filePath.read()
+
+    return new Response(fileBuffer, { headers: { 'Content-Type': 'image/webp' } })
   })
 
   protocol.handle('instrumenticons', (request) => {
     const root = getRockshelfModuleRootDir()
     const code = request.url.slice('instrumenticons://'.length)
-    let filePath = root.gotoFile(`bin/icons/instrument-icons-${code}.webp`)
-    if (!filePath.exists) filePath = root.gotoFile(`bin/icons/custom.webp`)
+    const filePath = root.gotoFile(`bin/icons/instrument-icons-${code}.webp`)
+
+    if (!filePath.exists) return new Response(null)
 
     return net.fetch(pathToFileURL(filePath.path).toString())
   })
@@ -41,7 +46,17 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     const rb3usrdir = getRB1USRDIR(userConfig.devhdd0Path)
     const packageFolderName = decodeURIComponent(request.url.slice('rb1packimg://'.length))
     const filePath = rb3usrdir.gotoFile(`${packageFolderName}/folder.jpg`)
-    return net.fetch(pathToFileURL(filePath.path).toString())
+
+    if (!filePath.exists) return new Response(null)
+
+    const fileBuffer = await filePath.read()
+
+    return new Response(fileBuffer, {
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'Cache-Control': 'no-store',
+      },
+    })
   })
 
   protocol.handle('rb3packimg', async (request) => {
@@ -50,15 +65,25 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     const rb3usrdir = getRB3USRDIR(userConfig.devhdd0Path)
     const packageFolderName = decodeURIComponent(request.url.slice('rb3packimg://'.length))
     const filePath = rb3usrdir.gotoFile(`${packageFolderName}/folder.jpg`)
-    return net.fetch(pathToFileURL(filePath.path).toString())
+
+    const fileBuffer = await filePath.read()
+
+    return new Response(fileBuffer, {
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'Cache-Control': 'no-store',
+      },
+    })
   })
 
   protocol.handle('rb3art', async (request) => {
     const root = getRockshelfModuleRootDir()
     const songShortname = request.url.slice('rb3art://'.length)
     const artwork = root.gotoFile(`bin/artworks/${songShortname}_keep.png`)
-    if (!artwork.exists) throw new Error(`Rock Band 3 artwork for songname "${songShortname}" not found, aborting...`)
-    return net.fetch(pathToFileURL(artwork.path).toString())
+
+    if (!artwork.exists) return new Response(null)
+
+    return net.fetch(pathToFileURL(artwork.path).toString(), { headers: { 'Content-Type': 'image/png' } })
   })
 
   electronApp.setAppUserModelId('com.electron.rockshelf')
@@ -69,6 +94,7 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
 
   createWindow(options)
   initMainProcessHandlers()
+  await initRichPresence()
 
   app.on('activate', function (event, hasVisibleWindows) {
     if (BrowserWindow.getAllWindows().length === 0) createWindow(options)

@@ -2,7 +2,7 @@ import { createHashFromBuffer, pathLikeToDirPath, type DirPathLikeTypes } from '
 import { DTAParser, EDATFile, TextureFile } from 'rbtools'
 import { getOfficialSongPackageStatsFromHash, rpcs3GenSongPackageManifest } from 'rbtools/lib'
 import { getRockshelfModuleRootDir } from '../../core.exports'
-import { createRSPackImageV1, parseRSPackImageFile, type RPCS3SongPackagesObjectExtra, type RSPackImageV1Object } from '../../lib.exports'
+import { createRSPackImage, parseRSPackImageFile, type RPCS3SongPackagesObjectExtra, type ParsedRSPackImageObject } from '../../lib.exports'
 import { temporaryFile } from 'tempy'
 
 export const getSongPackageStatsFromFolder = async (packagePath: DirPathLikeTypes): Promise<RPCS3SongPackagesObjectExtra | undefined> => {
@@ -32,7 +32,7 @@ export const getSongPackageStatsFromFolder = async (packagePath: DirPathLikeType
   const songIDs = parsedData.songs.map((song) => song.song_id).toSorted()
 
   const thumbnailSrc = packageDir.gotoFile('folder.jpg')
-  let packageData: RSPackImageV1Object
+  let packageData: ParsedRSPackImageObject
 
   if (!thumbnailSrc.exists) {
     if (parsedData.songs.length === 1) {
@@ -41,21 +41,21 @@ export const getSongPackageStatsFromFolder = async (packagePath: DirPathLikeType
       if (texture.path.exists) {
         const temp = await texture.convertToImage(temporaryFile({ extension: '.jpg' }), 'jpg')
         packageData = { fileVersion: 1, installationSrc: 'merged', installationType: 'other', packageName: `${onlySong.name} - ${onlySong.artist}` }
-        await createRSPackImageV1(temp.path, thumbnailSrc, packageData)
+        await createRSPackImage(temp.path, thumbnailSrc, packageData)
         await temp.path.delete()
       } else {
         let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
         if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
 
         packageData = { fileVersion: 1, installationSrc: 'merged', installationType: 'other', packageName: official?.name || packageDir.name }
-        await createRSPackImageV1(newPackageImage, thumbnailSrc, packageData)
+        await createRSPackImage(newPackageImage, thumbnailSrc, packageData)
       }
     } else {
       let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
       if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
 
       packageData = { fileVersion: 1, installationSrc: 'merged', installationType: 'other', packageName: official?.name || packageDir.name }
-      await createRSPackImageV1(newPackageImage, thumbnailSrc, packageData)
+      await createRSPackImage(newPackageImage, thumbnailSrc, packageData)
     }
   } else {
     packageData = await parseRSPackImageFile(thumbnailSrc)

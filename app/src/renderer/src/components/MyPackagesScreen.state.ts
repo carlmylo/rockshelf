@@ -1,16 +1,18 @@
-import type { DTACatalogGenericObject, DTACatalogByArtistObject, DTACatalogByDifficultyObject, DTACatalogTypes } from 'rbtools/lib'
+import type { DTAFilterGenericObject, DTAFilterByArtistObject, DTAFilterByDifficultyObject, DTAFilterTypes } from 'rbtools/lib'
 import { create } from 'zustand'
 
 export interface MyPackagesScreenStateProps {
   active: boolean
   selPKG: number
-  catalog: DTACatalogGenericObject | DTACatalogByArtistObject | DTACatalogByDifficultyObject | false | 'loading'
-  catalogSortBy: DTACatalogTypes
+  catalog: DTAFilterGenericObject | DTAFilterByArtistObject | DTAFilterByDifficultyObject | false | 'loading'
+  catalogSortBy: DTAFilterTypes
   packageDetailsTab: number
   hoveredPKG: number
   selSong: number
   isArtworkLoading: boolean
   artworkURL: string | null
+  editPackageName: string
+  editPackageEdited: boolean
 }
 
 export interface MyPackagesScreenStateActions {
@@ -44,6 +46,8 @@ const defaultState: MyPackagesScreenStateProps = {
   selSong: -1,
   isArtworkLoading: true,
   artworkURL: null,
+  editPackageName: '',
+  editPackageEdited: false,
 }
 
 export const useMyPackagesScreenState = create<MyPackagesScreenStateHook>()((set, get) => ({

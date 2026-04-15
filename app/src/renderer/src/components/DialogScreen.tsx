@@ -7,6 +7,7 @@ import { useWindowState } from '@renderer/stores/Window.state'
 import { LoadingIcon } from '@renderer/assets/icons'
 import { useShallow } from 'zustand/shallow'
 import { useMessageBoxState } from './MessageBox.state'
+import { InstrumentScoreData } from 'rbtools'
 
 function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -19,15 +20,15 @@ function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HT
 export function DialogScreen() {
   const { t } = useTranslation()
   const { active, deletePackageIndex, isLoadingAction, setDialogScreenState, resetDialogScreenState } = useDialogScreenState(useShallow((x) => ({ active: x.active, deletePackageIndex: x.deletePackageIndex, isLoadingAction: x.isLoadingAction, setDialogScreenState: x.setDialogScreenState, resetDialogScreenState: x.resetDialogScreenState })))
-  const { disableButtons, packages, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, packages: x.packages, setWindowState: x.setWindowState })))
+  const { disableButtons, packages, saveData, setWindowState } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, packages: x.packages, saveData: x.saveData, setWindowState: x.setWindowState })))
   const { setMessageBoxState } = useMessageBoxState(useShallow((x) => ({ setMessageBoxState: x.setMessageBoxState })))
 
   return (
-    <AnimatedSection id="DialogScreen" condition={active !== null} {...animate({ opacity: true })} className="absolute! z-100 h-full w-full items-center justify-center bg-black/90 p-16 backdrop-blur-lg">
+    <AnimatedSection id="DialogScreen" condition={active !== null} {...animate({ opacity: true })} className="absolute! z-40 h-full w-full items-center justify-center bg-black/90 p-16 backdrop-blur-lg">
       {active !== null && (
         <>
           <h1 className="mb-2 text-center text-[2rem] uppercase">{t(`${active}Title`)}</h1>
-          <p className="text-center">
+          <p className="font-pentatonic text-center text-lg">
             {t(
               // Is confirmDeletePackage
               active === 'confirmDeletePackage' && deletePackageIndex > -1 && typeof packages === 'object' && packages && deletePackageIndex in packages.packages
@@ -118,13 +119,18 @@ export function DialogScreen() {
                 <DialogButton
                   onClick={async () => {
                     try {
+                      setWindowState({ disableButtons: true })
                       const newPackages = await window.api.deletePackage(deletePackageIndex)
-                      setWindowState({ packages: newPackages })
+                      let newInstrumentScores: false | InstrumentScoreData = false
+                      if (typeof saveData === 'object') newInstrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                      setWindowState({ packages: newPackages, instrumentScores: newInstrumentScores })
                       setMessageBoxState({ message: { type: 'success', method: 'deletePackage', code: '' } })
                       resetDialogScreenState()
                     } catch (err) {
                       if (err instanceof Error) setWindowState({ err })
                     }
+
+                    setWindowState({ disableButtons: false })
                   }}
                   disabled={disableButtons}
                 >

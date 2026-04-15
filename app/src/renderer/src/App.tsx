@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, InstallPKGScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, SongDetails, Topbar, WindowFrame } from './components.exports'
+import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, ImageCropScreen, InstallPKGScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, RBIconsSelector, SongDetails, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
@@ -10,16 +10,17 @@ import { useMessageBoxState } from './components/MessageBox.state'
 import { useDialogScreenState } from './components/DialogScreen.state'
 import { useBuzyLoadScreenState } from './components/BuzyLoadScreen.state'
 import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
+import { useShallow } from 'zustand/shallow'
 
 export function App() {
   const { i18n } = useTranslation()
-  const setWindowState = useWindowState((x) => x.setWindowState)
-  const setFirstTimeScreenState = useFirstTimeScreenState((x) => x.setFirstTimeScreenState)
-  const setUserConfigState = useUserConfigState((x) => x.setUserConfigState)
-  const setLogoScreenState = useLogoScreenState((x) => x.setLogoScreenState)
-  const setMessageBoxState = useMessageBoxState((x) => x.setMessageBoxState)
-  const { setDialogScreenState } = useDialogScreenState.getState()
-  const setBuzyLoadScreenState = useBuzyLoadScreenState((x) => x.setBuzyLoadScreenState)
+  const { setWindowState, disableImg } = useWindowState(useShallow((x) => ({ setWindowState: x.setWindowState, disableImg: x.disableImg })))
+  const { setFirstTimeScreenState } = useFirstTimeScreenState(useShallow((x) => ({ setFirstTimeScreenState: x.setFirstTimeScreenState })))
+  const { setUserConfigState } = useUserConfigState(useShallow((x) => ({ setUserConfigState: x.setUserConfigState })))
+  const { setLogoScreenState } = useLogoScreenState(useShallow((x) => ({ setLogoScreenState: x.setLogoScreenState })))
+  const { setMessageBoxState } = useMessageBoxState(useShallow((x) => ({ setMessageBoxState: x.setMessageBoxState })))
+  const { setDialogScreenState } = useDialogScreenState(useShallow((x) => ({ setDialogScreenState: x.setDialogScreenState })))
+  const { setBuzyLoadScreenState } = useBuzyLoadScreenState(useShallow((x) => ({ setBuzyLoadScreenState: x.setBuzyLoadScreenState })))
 
   useEffect(function initApp() {
     const fn = async () => {
@@ -40,6 +41,8 @@ export function App() {
 
         console.log('struct UserConfigObject ["core/src/core/userConfigData.ts"]:', hasUserConfig)
         setUserConfigState(hasUserConfig)
+
+        window.api.discordRPSetUserConfig(hasUserConfig)
 
         const rb3Stats = await window.api.rpcs3GetRB3Stats()
         console.log('struct RockBand3Data ["rbtools/src/lib/rpcs3/rpcs3GetRB3Stats.ts"]:', rb3Stats)
@@ -84,8 +87,8 @@ export function App() {
   }, [])
 
   useEffect(function initLocaleReqListener() {
-    window.api.onLocaleRequest((_, uuid, key) => {
-      const text = i18n.exists(key) ? i18n.t(key) : key
+    window.api.onLocaleRequest((_, uuid, key, messageValues) => {
+      const text = i18n.exists(key) ? i18n.t(key, messageValues ?? {}) : key
       window.api.sendLocale(uuid, text)
     })
   }, [])
@@ -124,6 +127,13 @@ export function App() {
   useEffect(function initRendererConsoleListener() {
     window.api.onRendererConsole((_, val) => console.log(val))
   }, [])
+
+  useEffect(
+    function tickDisableImgVar() {
+      if (disableImg !== -1) setWindowState({ disableImg: -1 })
+    },
+    [disableImg]
+  )
   return (
     <>
       <Topbar />
@@ -135,11 +145,13 @@ export function App() {
         <DialogScreen />
         <FatalErrorScreen />
         <FirstTimeScreen />
+        <ImageCropScreen />
         <InstallPKGScreen />
         <LogoScreen />
         <MainScreen />
         <MessageBox />
         <MyPackagesScreen />
+        <RBIconsSelector />
         <SongDetails />
       </WindowFrame>
     </>

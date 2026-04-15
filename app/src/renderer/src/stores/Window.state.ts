@@ -17,11 +17,13 @@ export interface WindowStateProps {
    * Indicates whether the top bar buttons are disabled.
    */
   disableTopbarButtons: boolean
+  disableImg: number
   err: Error | null
   rb3Stats: false | RockBand3Data | 'loading'
   saveData: false | ParsedRB3SaveData | 'loading'
   instrumentScores: false | InstrumentScoreData | 'loading'
   packages: false | RPCS3SongPackagesDataExtra | 'loading'
+  richPresence: boolean
 }
 
 export interface WindowStateActions {
@@ -49,11 +51,13 @@ const defaultState: WindowStateProps = {
   isWinMaximized: false,
   disableButtons: true,
   disableTopbarButtons: false,
+  disableImg: -1,
   err: null,
   rb3Stats: false,
   instrumentScores: false,
   saveData: false,
   packages: false,
+  richPresence: false,
 }
 
 export const useWindowState: UseBoundStore<StoreApi<WindowStateHook>> = create<WindowStateHook>()(
