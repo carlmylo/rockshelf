@@ -34,6 +34,8 @@ export function createWindow(options: CreateWindowOptions): BrowserWindow {
     minHeight: 670,
     show: false,
     autoHideMenuBar: true,
+    fullscreenable: false,
+    resizable: false,
     frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {

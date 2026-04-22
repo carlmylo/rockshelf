@@ -1,3 +1,21 @@
+import rb3bg0 from './bgs/BLUS30463_screenshot_2024_08_03_02_08_45.webp'
+import rb3bg1 from './bgs/BLUS30463_screenshot_2024_12_14_04_00_24.webp'
+import rb3bg2 from './bgs/BLUS30463_screenshot_2024_12_22_01_39_52.webp'
+import rb3bg3 from './bgs/BLUS30463_screenshot_2024_12_22_02_44_44.webp'
+import rb3bg4 from './bgs/BLUS30463_screenshot_2025_01_18_14_50_35.webp'
+import rb3bg5 from './bgs/BLUS30463_screenshot_2025_01_18_14_52_22.webp'
+import rb3bg6 from './bgs/BLUS30463_screenshot_2025_04_03_00_57_13.webp'
+import rb3bg7 from './bgs/BLUS30463_screenshot_2025_04_03_01_14_57.webp'
+import rb3bg8 from './bgs/BLUS30463_screenshot_2025_10_18_19_23_57.webp'
+import rb3bg9 from './bgs/BLUS30463_screenshot_2025_12_26_15_24_42.webp'
+import rb3bg10 from './bgs/BLUS30463_screenshot_2025_12_26_15_27_01.webp'
+import rb3bg11 from './bgs/BLUS30463_screenshot_2025_12_26_15_27_47.webp'
+import rb3bg12 from './bgs/BLUS30463_screenshot_2025_12_26_15_27_56.webp'
+import rb3bg13 from './bgs/BLUS30463_screenshot_2025_12_26_15_31_37.webp'
+import rb3bg14 from './bgs/BLUS30463_screenshot_2025_12_26_15_33_59.webp'
+import rb3bg15 from './bgs/BLUS30463_screenshot_2025_12_26_15_35_16.webp'
+import rb3bg16 from './bgs/BLUS30463_screenshot_2025_12_26_15_36_41.webp'
+
 import ARGFlag from './images/flags/ar.svg'
 import BOLFlag from './images/flags/bo.svg'
 import BRAFlag from './images/flags/br.svg'
@@ -25,4 +43,4 @@ import proKeysIcon from './images/instrument-icons-prokeys.webp'
 import vocalsIcon from './images/instrument-icons-vocals.webp'
 import wavesPattern from './images/waves-seamless-pattern.webp'
 
-export { ARGFlag, BOLFlag, BRAFlag, COLFlag, MEXFlag, PERUFlag, PARYFlag, USAFlag, URUFlag, VEZFlag, imgIconRB3, imgIconRB3DX, bandIcon, bassIcon, drumsIcon, guitarIcon, harm2Icon, harm3Icon, keysIcon, proBassIcon, proDrumsIcon, proGuitarIcon, proKeysIcon, vocalsIcon, wavesPattern }
+export { ARGFlag, BOLFlag, BRAFlag, COLFlag, MEXFlag, PERUFlag, PARYFlag, USAFlag, URUFlag, VEZFlag, imgIconRB3, imgIconRB3DX, bandIcon, bassIcon, drumsIcon, guitarIcon, harm2Icon, harm3Icon, keysIcon, proBassIcon, proDrumsIcon, proGuitarIcon, proKeysIcon, vocalsIcon, wavesPattern, rb3bg0, rb3bg1, rb3bg10, rb3bg11, rb3bg12, rb3bg13, rb3bg14, rb3bg15, rb3bg16, rb3bg2, rb3bg3, rb3bg4, rb3bg5, rb3bg6, rb3bg7, rb3bg8, rb3bg9 }

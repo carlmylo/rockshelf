@@ -26,7 +26,7 @@ Rockshelf is a Rock Band 3 utility suite for RPCS3 users built with [Electron Vi
 # Special Thanks
 
 - [Carl Mylo](https://github.com/carlmylo)
-- [Rahpael Goulart](https://github.com/raphaelgoulart)
+- [raphaelgoulart](https://github.com/raphaelgoulart)
 - [TrojanNemo](https://github.com/trojannemo)
 - [Jnack](https://github.com/jnackmclain)
 - [Aloquendiar](https://github.com/Aloquendiar)

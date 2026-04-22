@@ -1,6 +1,6 @@
 import { GitHubCommitCompare, GitHubCommitResponse } from '@renderer/app/types'
-import { ParsedRB3SaveData, InstrumentScoreData } from 'rbtools'
-import { RockBand3Data } from 'rbtools/lib'
+import { ParsedRB3SaveData, InstrumentScoreData } from 'rockshelf-core/rbtools'
+import { RockBand3Data } from 'rockshelf-core/rbtools/lib'
 import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
 import { create, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'

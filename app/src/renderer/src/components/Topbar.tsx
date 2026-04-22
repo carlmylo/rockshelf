@@ -24,7 +24,7 @@ export function Topbar() {
       {import.meta.env.DEV && (
         <>
           <button className="h-full justify-center px-3 duration-200 hover:bg-green-500/50" onClick={async () => await window.api.openUserDataFolder()}>
-            <FolderWithPlusIcon />
+            <FolderWithPlusIcon className="text-base" />
           </button>
           <div className="mx-2 h-full w-px py-1.5">
             <div className="bg-default-white/25 h-full w-full" />
@@ -32,9 +32,9 @@ export function Topbar() {
         </>
       )}
       <button className="h-full justify-center px-3 duration-200 hover:bg-white/25 disabled:bg-black/50 disabled:text-neutral-600" disabled={disableTopbarButtons} onClick={async () => await window.api.windowMinimize()}>
-        <MinimizeIcon />
+        <MinimizeIcon className="text-base" />
       </button>
-      <button
+      {/* <button
         className="h-full justify-center px-3 duration-200 hover:bg-white/25 disabled:bg-black/50 disabled:text-neutral-600"
         disabled={disableTopbarButtons}
         onClick={async () => {
@@ -42,10 +42,10 @@ export function Topbar() {
           setWindowState({ isWinMaximized: isWinMax })
         }}
       >
-        {isWinMaximized ? <RestoreWinIcon /> : <MaximizeIcon />}
-      </button>
+        {isWinMaximized ? <RestoreWinIcon className="text-base" /> : <MaximizeIcon className="text-base" />}
+      </button> */}
       <button className="h-full justify-center px-3 duration-200 hover:bg-red-500 disabled:bg-black/50 disabled:text-neutral-600" disabled={disableTopbarButtons} onClick={async () => await window.api.windowClose()}>
-        <CloseIcon />
+        <CloseIcon className="text-base" />
       </button>
     </header>
   )

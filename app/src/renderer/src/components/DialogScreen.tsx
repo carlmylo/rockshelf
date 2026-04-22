@@ -7,7 +7,7 @@ import { useWindowState } from '@renderer/stores/Window.state'
 import { LoadingIcon } from '@renderer/assets/icons'
 import { useShallow } from 'zustand/shallow'
 import { useMessageBoxState } from './MessageBox.state'
-import { InstrumentScoreData } from 'rbtools'
+import { InstrumentScoreData } from 'rockshelf-core/rbtools'
 
 function DialogButton({ children, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (

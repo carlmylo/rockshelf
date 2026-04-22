@@ -5,3 +5,7 @@ export * from './app/lib/motion/animate'
 export * from './app/lib/motion/components'
 
 export * from './app/lib/strnum/bytesSize'
+export * from './app/lib/strnum/formatNumberWithDots'
+export * from './app/lib/strnum/rng'
+
+export * from './app/lib/utils/sleep'

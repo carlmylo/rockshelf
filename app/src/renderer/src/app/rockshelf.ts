@@ -13,4 +13,8 @@ export const PACKAGE_DETAILS_TABS = {
 export const CREATE_NEW_PACKAGE_TABS = {
   FILES: 0,
   OPTIONS: 1,
-}
+} as const
+
+export const SONG_DETAILS_TABS = {
+  LEADERBOARDS: 0,
+} as const

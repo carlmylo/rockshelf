@@ -35,7 +35,7 @@ export function CreateNewPackageScreen() {
   return (
     <AnimatedSection id="CreateNewPackageScreen" condition={active} {...animate({ opacity: true })} className="absolute! z-3 h-full max-h-full w-full max-w-full bg-black/90 p-8 backdrop-blur-lg">
       <div className="mb-2 flex-row! border-b border-white/25 pb-1">
-        <img src={packageArtwork ?? 'rbicons://custom'} className="mr-2 h-32 min-h-32 w-32 min-w-32" />
+        <img src={packageArtwork ?? 'rbicons://custom'} className="mr-2 h-32 min-h-32 w-32 min-w-32 border-2 border-neutral-700" />
         <div className="mr-auto">
           <h1 className="font-pentatonicalt! mr-auto text-[2rem] uppercase">{t('createNewPackage')}</h1>
           <h2 className="font-pentatonic h-6">{packageName}</h2>
@@ -51,9 +51,10 @@ export function CreateNewPackageScreen() {
               try {
                 const results = await window.api.createNewPackage({ packages: files.map((file) => file.data.path.path), packageFolderName, packageName, forceEncryption, thumbnail: packageArtwork })
                 console.log('struct SerializedRPCS3PackageExtractionObject [core/src/controllers/createNewPackage.ts]', results)
-                // if (results) {
-                //   const { path } = results
-                // }
+                if (results) {
+                  console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', results.packagesData)
+                  setWindowState({ packages: results.packagesData })
+                }
               } catch (err) {
                 if (err instanceof Error) setWindowState({ err })
               }
@@ -93,6 +94,15 @@ export function CreateNewPackageScreen() {
         >
           {t('options')}
         </button>
+        {/* <button
+          disabled={disableButtons}
+          className={clsx(navIndex === CREATE_NEW_PACKAGE_TABS.OPTIONS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+          onClick={() => {
+            setCreateNewPackageScreenState({ navIndex: CREATE_NEW_PACKAGE_TABS.OPTIONS })
+          }}
+        >
+          {t('updateAllSongs')}
+        </button> */}
       </div>
       {navIndex === CREATE_NEW_PACKAGE_TABS.FILES && (
         <>

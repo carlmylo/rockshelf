@@ -13,14 +13,14 @@ import { useRBIconsSelectorState } from './RBIconsSelector.state'
 import { useImageCropScreenState } from './ImageCropScreen.state'
 import { PACKAGE_DETAILS_TABS } from '@renderer/app/rockshelf'
 
-export function StarsInline({ stars }: { stars: number }) {
+export function StarsInline({ stars, width }: { stars: number; width?: number }) {
   return (
     <div className="flex-row! items-center">
-      <img className="mr-0.5 w-4" src={stars >= 1 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
-      <img className="mr-0.5 w-4" src={stars >= 2 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
-      <img className="mr-0.5 w-4" src={stars >= 3 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
-      <img className="mr-0.5 w-4" src={stars >= 4 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
-      <img className="w-4" src={stars >= 5 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
+      <img className={`mr-0.5 last:mr-0`} style={{ width: `${width || 4}rem` }} src={stars >= 1 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
+      <img className={`mr-0.5 last:mr-0`} style={{ width: `${width || 4}rem` }} src={stars >= 2 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
+      <img className={`mr-0.5 last:mr-0`} style={{ width: `${width || 4}rem` }} src={stars >= 3 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
+      <img className={`mr-0.5 last:mr-0`} style={{ width: `${width || 4}rem` }} src={stars >= 4 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
+      <img className={`mr-0.5 last:mr-0`} style={{ width: `${width || 4}rem` }} src={stars >= 5 ? (stars === 6 ? 'rbicons://rb4-stars-gold' : 'rbicons://rb4-stars') : 'rbicons://rb4-stars-out'} />
     </div>
   )
 }
@@ -84,7 +84,7 @@ export function PackageDetails() {
         <>
           <div className="flex-row! items-center border-b border-white/15 pb-2">
             <div>
-              <img src={disableImg === selPKG ? undefined : active.thumbnailSrc} className="mr-2 h-32 min-h-32 w-32 min-w-32" />
+              <img src={disableImg === selPKG ? undefined : active.thumbnailSrc} className="mr-2 h-32 min-h-32 w-32 min-w-32 border-2 border-neutral-700" />
               {typeof instrumentScores === 'object' && <img title={t(instrumentScores.instrument)} src={`instrumenticons://${instrumentScores.instrument.toLowerCase()}`} className="absolute! -right-[0.3rem] -bottom-[0.3rem] mr-2 h-6 w-6 opacity-95" />}
             </div>
 
@@ -186,7 +186,7 @@ export function PackageDetails() {
                                         return (
                                           <div className="flex-row! items-center">
                                             <h1 className="mr-2">{`0%`}</h1>
-                                            <StarsInline stars={0} />
+                                            <StarsInline stars={0} width={1.2} />
                                           </div>
                                         )
                                       else {
@@ -195,7 +195,7 @@ export function PackageDetails() {
                                         return (
                                           <div className="flex-row! items-center">
                                             <h1 className="mr-2">{`${perc}%`}</h1>
-                                            <StarsInline stars={stars} />
+                                            <StarsInline stars={stars} width={1.2} />
                                           </div>
                                         )
                                       }
@@ -234,8 +234,8 @@ export function PackageDetails() {
                                             setMyPackagesScreenState({ selSong: songIndex })
                                           }}
                                         >
-                                          <h2 className="font-pentatonic mr-2">{song.name}</h2>
-                                          <h2 className="mr-auto text-xs text-neutral-600 italic">{song.artist}</h2>
+                                          <h2 className="font-pentatonic mr-auto">{song.name}</h2>
+                                          {/* <h2 className="mr-auto text-xs text-neutral-600 italic">{song.artist}</h2> */}
                                           {typeof saveData === 'object' &&
                                             (() => {
                                               const score = saveData.scores.find((val) => val.song_id === song.song_id)
@@ -244,7 +244,7 @@ export function PackageDetails() {
                                                 return (
                                                   <div className="flex-row! items-center">
                                                     <h1 className="mr-2">{`0%`}</h1>
-                                                    <StarsInline stars={0} />
+                                                    <StarsInline stars={0} width={1.2} />
                                                   </div>
                                                 )
                                               else {
@@ -253,7 +253,7 @@ export function PackageDetails() {
                                                 return (
                                                   <div className="flex-row! items-center">
                                                     <h1 className="mr-2">{`${perc}%`}</h1>
-                                                    <StarsInline stars={stars} />
+                                                    <StarsInline stars={stars} width={1.2} />
                                                   </div>
                                                 )
                                               }
@@ -275,8 +275,8 @@ export function PackageDetails() {
                                     setMyPackagesScreenState({ selSong: songIndex })
                                   }}
                                 >
-                                  <h2 className="font-pentatonic mr-2">{song.name}</h2>
-                                  <h2 className="mr-auto text-xs text-neutral-600 italic">{song.artist}</h2>
+                                  <h2 className="font-pentatonic mr-auto">{song.name}</h2>
+                                  {/* <h2 className="mr-auto text-xs text-neutral-600 italic">{song.artist}</h2> */}
                                   {typeof saveData === 'object' &&
                                     (() => {
                                       const score = saveData.scores.find((val) => val.song_id === song.song_id)
@@ -285,7 +285,7 @@ export function PackageDetails() {
                                         return (
                                           <div className="flex-row! items-center">
                                             <h1 className="mr-2">{`0%`}</h1>
-                                            <StarsInline stars={0} />
+                                            <StarsInline stars={0} width={1.2} />
                                           </div>
                                         )
                                       else {
@@ -294,7 +294,7 @@ export function PackageDetails() {
                                         return (
                                           <div className="flex-row! items-center">
                                             <h1 className="mr-2">{`${perc}%`}</h1>
-                                            <StarsInline stars={stars} />
+                                            <StarsInline stars={stars} width={1.2} />
                                           </div>
                                         )
                                       }

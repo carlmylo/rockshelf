@@ -47,6 +47,18 @@
     "./preload": {
       "types": "./dist/preload.d.ts",
       "import": "./dist/preload.js"
+    },
+    "./rbtools": {
+      "types": "./dist/lib/rbtools/index.d.ts",
+      "import": "./dist/lib/rbtools/index.js"
+    },
+    "./rbtools/lib": {
+      "types": "./dist/lib/rbtools/lib.exports.d.ts",
+      "import": "./dist/lib/rbtools/lib.exports.js"
+    },
+    "./rbtools/utils": {
+      "types": "./dist/lib/rbtools/utils.exports.d.ts",
+      "import": "./dist/lib/rbtools/utils.exports.js"
     }
   }
 }

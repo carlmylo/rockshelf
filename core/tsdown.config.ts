@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/preload.ts'],
+  entry: ['src/index.ts', 'src/preload.ts', 'src/lib/rbtools/index.ts', 'src/lib/rbtools/lib.exports.ts', 'src/lib/rbtools/utils.exports.ts'],
   fixedExtension: false,
   minify: false,
   unbundle: true,

@@ -65,7 +65,7 @@ export function MyPackagesScreen() {
                           setWindowState({ disableButtons: false })
                         }}
                       >
-                        <img src={disableImg === packageI ? undefined : pkg.thumbnailSrc} className="mr-2 h-20 min-h-20 w-20 min-w-20" />
+                        <img src={disableImg === packageI ? undefined : pkg.thumbnailSrc} className="mr-2 h-20 min-h-20 w-20 min-w-20 border-2 border-neutral-700" />
                         <div className="mr-auto">
                           <h2 className="font-pentatonic text-xl">{pkg.packageData.packageName}</h2>
                           <h3 className="mb-2 text-xs text-neutral-500 italic">

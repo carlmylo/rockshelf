@@ -3,10 +3,9 @@ import { animate, AnimatedDiv, AnimatedSection, TransComponent } from '@renderer
 import { useMainScreenState } from './MainScreen.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
-import { LoadingIcon } from '@renderer/assets/icons'
-import type { ParsedRB3SaveData, InstrumentScoreData } from 'rbtools'
+import type { ParsedRB3SaveData, InstrumentScoreData } from 'rockshelf-core/rbtools'
 import { DXNIGHTLYLINK, TU5LINK } from '@renderer/app/rockshelf'
-import { RockBand3Data } from 'rbtools/lib'
+import type { RockBand3Data } from 'rockshelf-core/rbtools/lib'
 import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
 import { useMessageBoxState } from './MessageBox.state'
 import { useConfigScreenState } from './ConfigScreen.state'
@@ -25,7 +24,7 @@ export function MainScreen() {
   const { setCreateNewPackageScreenState } = useCreateNewPackageScreenState(useShallow((x) => ({ setCreateNewPackageScreenState: x.setCreateNewPackageScreenState })))
 
   return (
-    <AnimatedSection id="MainScreen" condition={active} className="z-0 h-full max-h-full w-full max-w-full overflow-y-hidden p-8">
+    <AnimatedSection id="MainScreen" condition={active} className="z-1 h-full max-h-full w-full max-w-full overflow-y-hidden bg-black/90 p-8">
       <div className="h-full max-h-full w-full max-w-full overflow-y-auto">
         <div className="mb-4 h-12 w-full flex-row! items-center rounded-sm border border-neutral-900 bg-neutral-800 px-3 py-2">
           {typeof rb3Stats === 'object' && rb3Stats.userName && rb3Stats.hasSaveData && typeof saveData === 'object' && typeof instrumentScores === 'object' && (
@@ -110,7 +109,7 @@ export function MainScreen() {
           {typeof rb3Stats === 'object' && (
             <>
               <div className="mr-4 h-48 max-h-48 w-48 max-w-48">
-                <img src={`rbicons://${rb3Stats.hasDeluxe ? 'dx' : 'rb3'}`} className={clsx(!rb3Stats.hasGameInstalled && 'grayscale', 'mr-4 mb-2 h-48 min-h-48 w-48 min-w-48 duration-200')} />
+                <img src={`rbicons://${rb3Stats.hasDeluxe ? 'dx' : 'rb3'}`} className={clsx(!rb3Stats.hasGameInstalled && 'grayscale', 'mr-4 mb-2 h-48 min-h-48 w-48 min-w-48 border-2 border-neutral-700 duration-200')} />
 
                 <button
                   className="mb-2 w-full self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"

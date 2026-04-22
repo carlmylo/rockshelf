@@ -1,16 +1,15 @@
 import { useEffect } from 'react'
-import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, ImageCropScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, RBIconsSelector, SongDetails, Topbar, WindowFrame } from './components.exports'
+import { BuzyLoadScreen, ConfigScreen, CreateNewPackageScreen, DeluxeInstallScreen, DialogScreen, FatalErrorScreen, FirstTimeScreen, ImageCropScreen, LogoScreen, MainScreen, MessageBox, MyPackagesScreen, RBBackground, RBIconsSelector, SongDetails, Topbar, WindowFrame } from './components.exports'
 import { useWindowState } from './stores/Window.state'
 import { useFirstTimeScreenState } from './components/FirstTimeScreen.state'
 import { useTranslation } from 'react-i18next'
 import { useUserConfigState } from './stores/UserConfig.state'
-import { InstrumentScoreData, ParsedRB3SaveData } from 'rbtools'
 import { useLogoScreenState } from './components/LogoScreen.state'
 import { useMessageBoxState } from './components/MessageBox.state'
 import { useDialogScreenState } from './components/DialogScreen.state'
-import { useBuzyLoadScreenState } from './components/BuzyLoadScreen.state'
 import { RPCS3SongPackagesDataExtra } from 'rockshelf-core'
 import { useShallow } from 'zustand/shallow'
+import type { InstrumentScoreData, ParsedRB3SaveData } from 'rockshelf-core/rbtools'
 
 export function App() {
   const { i18n } = useTranslation()
@@ -77,7 +76,7 @@ export function App() {
     const touts: NodeJS.Timeout[] = []
 
     const t1 = setTimeout(() => setLogoScreenState({ showText: true }), 500)
-    const t2 = setTimeout(() => fn().then(() => undefined), 1500)
+    const t2 = setTimeout(() => fn().then(() => undefined), 2500)
     touts.push(t1, t2)
 
     return () => {
@@ -131,6 +130,7 @@ export function App() {
         <MainScreen />
         <MessageBox />
         <MyPackagesScreen />
+        <RBBackground />
         <RBIconsSelector />
         <SongDetails />
       </WindowFrame>
