@@ -4,10 +4,10 @@ import { useUserConfigState } from '@renderer/stores/UserConfig.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useTranslation } from 'react-i18next'
 import { useMessageBoxState } from './MessageBox.state'
-import { RockBand3Data } from 'rbtools/lib'
 import clsx from 'clsx'
 import { BRAFlag, MEXFlag, USAFlag, ARGFlag, BOLFlag, COLFlag, PARYFlag, PERUFlag, URUFlag, VEZFlag, bandIcon, guitarIcon, bassIcon, drumsIcon, keysIcon, vocalsIcon, proGuitarIcon, proBassIcon, proDrumsIcon, proKeysIcon, harm3Icon } from '@renderer/assets/images'
 import { useShallow } from 'zustand/shallow'
+import type { RockBand3Data } from 'rockshelf-core/rbtools/lib'
 
 export function ConfigScreen() {
   const { i18n, t } = useTranslation()

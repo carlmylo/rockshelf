@@ -1,4 +1,4 @@
-import { RPCS3ExtractionOptions } from 'rbtools/lib'
+import { RPCS3ExtractionOptions } from 'rockshelf-core/rbtools/lib'
 import { SelectPackageFilesStatsTypes } from 'rockshelf-core'
 import { create } from 'zustand'
 

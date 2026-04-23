@@ -1,4 +1,4 @@
-import { AnimatedDiv, AnimatedSection, animate, formatNumberWithDots } from '@renderer/lib.exports'
+import { AnimatedDiv, AnimatedSection, TransComponent, animate, formatNumberWithDots } from '@renderer/lib.exports'
 import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useEffect, useMemo } from 'react'
@@ -9,18 +9,24 @@ import { useShallow } from 'zustand/shallow'
 import { SONG_DETAILS_TABS } from '@renderer/app/rockshelf'
 import { useUserConfigState } from '@renderer/stores/UserConfig.state'
 import { StarsInline } from './PackageDetails'
+import { bandIcon, guitarIcon, bassIcon, drumsIcon, keysIcon, vocalsIcon, proGuitarIcon, proBassIcon, proDrumsIcon, proKeysIcon, harm3Icon } from '@renderer/assets/images'
 
 export function SongDetails() {
   const { t } = useTranslation()
   const { selPKG, selSong, isArtworkLoading, artworkURL, songDetailsTab, songLeaderboards, setMyPackagesScreenState } = useMyPackagesScreenState(useShallow((x) => ({ selPKG: x.selPKG, selSong: x.selSong, isArtworkLoading: x.isArtworkLoading, artworkURL: x.artworkURL, setMyPackagesScreenState: x.setMyPackagesScreenState, songDetailsTab: x.songDetailsTab, songLeaderboards: x.songLeaderboards })))
   const { mostPlayedInstrument } = useUserConfigState(useShallow((x) => ({ mostPlayedInstrument: x.mostPlayedInstrument })))
-  const { disableButtons, setWindowState, packages } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState, packages: x.packages })))
+  const { disableButtons, setWindowState, packages, saveData } = useWindowState(useShallow((x) => ({ disableButtons: x.disableButtons, setWindowState: x.setWindowState, packages: x.packages, saveData: x.saveData })))
   const packageDetails = useMemo(() => (typeof packages === 'object' && selPKG > -1 && selPKG in packages.packages ? packages.packages[selPKG] : null), [packages, selPKG])
   const songDetails = useMemo(() => (typeof packages === 'object' && selPKG > -1 && selPKG in packages.packages && selSong > -1 && packageDetails !== null && selSong in packageDetails.songs ? packageDetails.songs[selSong] : null), [packages, selPKG, selSong])
+  const { setUserConfigState } = useUserConfigState(useShallow((x) => ({ setUserConfigState: x.setUserConfigState })))
+
+  const allTracksCount = useMemo(() => songDetails?.tracks_count.reduce<number>((prev, curr) => (curr ? prev + curr : prev), 0), [songDetails])
 
   const resetSongDetailsState = () => {
     setMyPackagesScreenState({ selSong: -1, isArtworkLoading: true, artworkURL: '', songDetailsTab: 0, songLeaderboards: false })
   }
+
+  console.log()
 
   useEffect(
     function getArtworkFromSong() {
@@ -48,7 +54,7 @@ export function SongDetails() {
   useEffect(
     function () {
       const start = async () => {
-        if (songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS && typeof songLeaderboards !== 'object' && songDetails !== null && typeof songDetails.song_id === 'number') {
+        if (songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS && songDetails !== null && typeof songDetails.song_id === 'number') {
           setMyPackagesScreenState({ songLeaderboards: 'loading' })
           const leaderboards = await window.api.getScoresFromGoCentral(songDetails.song_id, mostPlayedInstrument)
           console.log('struct GoCentralLeaderboardResultObject [core/src/lib/rbtools/core/GoCentralAPI.ts]', leaderboards)
@@ -57,7 +63,7 @@ export function SongDetails() {
       }
       void start()
     },
-    [songDetails]
+    [songDetailsTab, songDetails, mostPlayedInstrument]
   )
 
   return (
@@ -121,18 +127,258 @@ export function SongDetails() {
           <div className="mb-2 h-6 min-h-6 w-full flex-row! items-center rounded-b-sm bg-white/15 px-4">
             <button
               disabled={disableButtons}
-              className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+              className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.DETAILS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
               onClick={() => {
-                setMyPackagesScreenState({ packageDetailsTab: SONG_DETAILS_TABS.LEADERBOARDS })
+                setMyPackagesScreenState({ songDetailsTab: SONG_DETAILS_TABS.DETAILS })
               }}
             >
-              <img src={`instrumenticons://${mostPlayedInstrument}`} className="mr-1 h-5 w-5" />
+              {t('details')}
+            </button>
+            <button
+              disabled={disableButtons}
+              className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+              onClick={() => {
+                setMyPackagesScreenState({ songDetailsTab: SONG_DETAILS_TABS.LEADERBOARDS })
+              }}
+            >
+              <img src={`instrumenticons://${mostPlayedInstrument}`} className={clsx('mr-1 h-5 w-5', songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS ? 'opacity-100' : 'opacity-75')} />
               {t('leaderboards')}
             </button>
+            {packageDetails?.official?.code !== 'rb3' && (
+              <>
+                <button
+                  disabled={disableButtons}
+                  className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.MISC ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+                  onClick={() => {
+                    setMyPackagesScreenState({ songDetailsTab: SONG_DETAILS_TABS.MISC })
+                  }}
+                >
+                  {t('misc')}
+                </button>
+              </>
+            )}
           </div>
+          {songDetailsTab === SONG_DETAILS_TABS.DETAILS && (
+            <>
+              <div className="h-full w-full overflow-y-auto"></div>
+            </>
+          )}
           {songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS && (
             <>
               <div className="h-full w-full overflow-y-auto">
+                <div className="mb-2 flex-row! items-center">
+                  <button
+                    title={t('band')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'band' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'band' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'band' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={bandIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('guitar')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'guitar' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'guitar' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'guitar' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={guitarIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('bass')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'bass' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'bass' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'bass' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={bassIcon} width={24} />
+                  </button>
+
+                  <button
+                    title={t('drums')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'drums' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'drums' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'drums' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={drumsIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('keys')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'keys' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'keys' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'keys' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={keysIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('vocals')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'vocals' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'vocals' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'vocals' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={vocalsIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('proGuitar')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'proGuitar' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'proGuitar' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'proGuitar' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={proGuitarIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('proBass')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'proBass' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'proBass' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'proBass' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={proBassIcon} width={24} />
+                  </button>
+
+                  <button
+                    title={t('proDrums')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'proDrums' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'proDrums' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'proDrums' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={proDrumsIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('proKeys')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'proKeys' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'proKeys' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'proKeys' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={proKeysIcon} width={24} />
+                  </button>
+                  <button
+                    title={t('harmonies')}
+                    disabled={disableButtons}
+                    className={clsx('mr-2 flex-row! items-center rounded-xs border border-neutral-800 px-2 py-1 font-sans! text-xs! uppercase duration-200 last:mr-0', mostPlayedInstrument === 'harmonies' ? 'bg-neutral-400 text-neutral-900 hover:bg-neutral-300 active:bg-neutral-200' : 'bg-neutral-900 hover:bg-neutral-800 active:bg-neutral-700')}
+                    onClick={async () => {
+                      setWindowState({ disableButtons: true })
+                      setUserConfigState({ mostPlayedInstrument: 'harmonies' })
+                      await window.api.saveUserConfigFile({ mostPlayedInstrument: 'harmonies' })
+                      if (typeof saveData === 'object') {
+                        const newInstrScores = await window.api.rpcs3GetInstrumentScores(saveData)
+                        console.log('struct InstrumentScoreData ["rbtools/src/lib/rpcs3/getInstrumentScoresData.ts"]:', newInstrScores)
+                        setWindowState({ instrumentScores: newInstrScores })
+                      }
+                      setMyPackagesScreenState({ catalog: false })
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    <img src={harm3Icon} width={24} />
+                  </button>
+                </div>
                 {songLeaderboards === 'loading' && <p>{t('loadingSongLeaderboards')}</p>}
                 {typeof songLeaderboards === 'object' && (
                   <>
@@ -149,14 +395,14 @@ export function SongDetails() {
                                 default:
                                   return <RPCS3Icon className="h-3.5 w-3.5" title="RPCS3" />
                                 case 'ps3':
-                                  return <PlaystationIcon className="text-lg" title="PlayStation 3" />
+                                  return <PlaystationIcon className="text-lg" title="PlayStation® 3" />
                                 case 'wii':
-                                  return <WiiIcon className="h-6 w-6" title="Nintendo Wii" />
+                                  return <WiiIcon className="h-6 w-6" title="Nintendo® Wii" />
                                 case 'xbox':
-                                  return <XboxIcon className="text-sm" title="Xbox 360" />
+                                  return <XboxIcon className="text-sm" title="Xbox® 360" />
                               }
                             })()}
-                            <h2 className="mr-2 ml-auto font-mono font-bold text-base">{formatNumberWithDots(score.score)}</h2>
+                            <h2 className="mr-2 ml-auto font-mono text-base font-bold">{formatNumberWithDots(score.score)}</h2>
                             <div className={clsx('mr-2 rounded-xs bg-neutral-800 px-1 py-0.5', scoreIndex >= 0 && scoreIndex <= 2 ? 'text-neutral-200' : '')}>
                               {(() => {
                                 switch (score.difficulty) {
@@ -182,6 +428,39 @@ export function SongDetails() {
               </div>
             </>
           )}
+
+          {/* {songDetailsTab === SONG_DETAILS_TABS.MISC && (
+            <>
+              <div className="h-full w-full overflow-y-auto">
+                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                  <h1 className="mb-1 uppercase">{t('extractMultitrack')}</h1>
+                  <p className="mb-4 text-xs italic">
+                    <TransComponent i18nKey="extractMultitrackDesc" />
+                  </p>
+
+                  <div className="flex-row! items-center">
+                    <button
+                      disabled={disableButtons}
+                      className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                      onClick={async () => {
+                        setWindowState({ disableButtons: true })
+                        if (packageDetails) {
+                          try {
+                            await window.api.extractMultitrackFromSong(packageDetails.path, songDetails)
+                          } catch (err) {
+                            if (err instanceof Error) setWindowState({ err })
+                          }
+                        }
+                        setWindowState({ disableButtons: false })
+                      }}
+                    >
+                      {t('extract')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )} */}
         </>
       )}
     </AnimatedSection>

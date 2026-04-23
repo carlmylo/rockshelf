@@ -16,5 +16,7 @@ export const CREATE_NEW_PACKAGE_TABS = {
 } as const
 
 export const SONG_DETAILS_TABS = {
-  LEADERBOARDS: 0,
+  DETAILS: 0,
+  LEADERBOARDS: 1,
+  MISC: 2,
 } as const

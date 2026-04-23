@@ -314,39 +314,31 @@ export function PackageDetails() {
 
           {packageDetailsTab === PACKAGE_DETAILS_TABS.DETAILS && (
             <>
-              <div className="group h-full w-full overflow-x-hidden rounded-sm bg-neutral-950 p-3 duration-200">
-                {active.official?.code !== 'rb3' && (
-                  <>
-                    <div className="mb-1 border-b border-white/25 pb-1">
-                      <h1 className="text-lg uppercase">{t('packageFolderName')}</h1>
-                    </div>
-                    <p className="mb-2">{active.name}</p>
-
-                    <div className="mb-1 flex-row! items-center border-b border-white/25 pb-1">
-                      <h1 className="mr-auto text-lg uppercase">{t('packagePath')}</h1>
-                      <button
-                        disabled={disableButtons}
-                        className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                        onClick={async () => {
-                          await window.api.openFolderInExplorer(active.path)
-                        }}
-                      >
-                        {t('openPackageFolder')}
-                      </button>
-                    </div>
-                    <p className="mb-2 font-mono">{active.path}</p>
-                  </>
-                )}
-
-                <div className="mb-1 border-b border-white/25 pb-1">
-                  <h1 className="text-lg uppercase">{t('packageSize')}</h1>
+              <div className="h-full w-full overflow-y-auto">
+                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                  <h1 className="mb-1 uppercase">{t('packagePath')}</h1>
+                  <p className="mb-4 font-mono text-xs italic">{active.path}</p>
+                  <div className="flex-row! items-center">
+                    <button
+                      disabled={disableButtons}
+                      className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                      onClick={async () => {
+                        await window.api.openFolderInExplorer(active.path)
+                      }}
+                    >
+                      {t('openPackageFolder')}
+                    </button>
+                  </div>
                 </div>
-                <p className="mb-2">{getReadableBytesSize(active.packageSize)}</p>
-
+                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                  <h1 className="mb-1 uppercase">{t('packageSize')}</h1>
+                  <p className="text-xs italic">{getReadableBytesSize(active.packageSize)}</p>
+                </div>
                 {active.official?.code !== 'rb3' && (
                   <>
-                    <div className="mb-1 flex-row! items-center border-b border-white/25 pb-1">
-                      <h1 className="mr-auto text-lg uppercase">{t('packageHash')}</h1>
+                    <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                      <h1 className="mb-1 uppercase">{t('packageHash')}</h1>
+                      <p className="mb-4 font-mono text-xs italic">{active.contentsHash}</p>
                       <button
                         disabled={disableButtons}
                         className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
@@ -362,11 +354,8 @@ export function PackageDetails() {
                         {t('copyHash')}
                       </button>
                     </div>
-                    <p className="mb-2 font-mono">{active.contentsHash}</p>
                   </>
                 )}
-
-                {/* <p className="font-mono wrap-break-word whitespace-pre-wrap">{JSON.stringify(active, null, 4)}</p> */}
               </div>
             </>
           )}
