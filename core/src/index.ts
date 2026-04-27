@@ -1,12 +1,11 @@
 import { app, BrowserWindow, protocol, net, ipcMain } from 'electron'
 import { pathToFileURL } from 'node:url'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { checkDeps, createTempFolders, createWindow, getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir, getRockshelfTempDir, initRichPresence, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
+import { createTempFolders, createWindow, getRB1USRDIR, getRB3USRDIR, getRockshelfModuleRootDir, getRockshelfTempDir, initRichPresence, readUserConfigFile, setElectronUserDataFolder, type CreateWindowOptions } from './core.exports'
 import { initMainProcessHandlers } from './initMainProcessHandlers'
 
 export async function initRockshelfMainProcess(options: CreateWindowOptions): Promise<void> {
   await setElectronUserDataFolder(app, 'Rockshelf')
-  await checkDeps(app)
   await createTempFolders()
 
   app.on('window-all-closed', () => {
@@ -35,6 +34,16 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     const root = getRockshelfModuleRootDir()
     const code = request.url.slice('instrumenticons://'.length)
     const filePath = root.gotoFile(`bin/icons/instrument-icons-${code}.webp`)
+
+    if (!filePath.exists) return new Response(null)
+
+    return net.fetch(pathToFileURL(filePath.path).toString())
+  })
+
+  protocol.handle('instrumenticonscolor', (request) => {
+    const root = getRockshelfModuleRootDir()
+    const code = request.url.slice('instrumenticonscolor://'.length)
+    const filePath = root.gotoFile(`bin/icons/instrument-icons-${code}-color.webp`)
 
     if (!filePath.exists) return new Response(null)
 
@@ -102,12 +111,6 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
         'Cache-Control': 'no-store',
       },
     })
-  })
-
-  electronApp.setAppUserModelId('com.electron.rockshelf')
-
-  app.on('browser-window-created', (event, window) => {
-    optimizer.watchWindowShortcuts(window)
   })
 
   electronApp.setAppUserModelId('com.electron.rockshelf')

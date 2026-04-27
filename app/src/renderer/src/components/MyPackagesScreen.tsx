@@ -69,7 +69,7 @@ export function MyPackagesScreen() {
                         <div className="mr-auto">
                           <h2 className="font-pentatonic text-xl">{pkg.packageData.packageName}</h2>
                           <h3 className="mb-2 text-xs text-neutral-500 italic">
-                            {t(pkg.songs.length === 1 ? 'songCount' : 'songCountPlural', { count: pkg.songs.length })} / {getReadableBytesSize(pkg.packageSize)}
+                            {t(pkg.songs.length === 1 ? 'songsCount' : 'songsCountPlural', { count: pkg.songs.length })} / {getReadableBytesSize(pkg.packageSize)}
                           </h3>
                           {pkg.official?.code !== 'rb3' && <p className="absolute! bottom-0 rounded-xs bg-neutral-950 px-2 py-0.5 font-mono text-xs whitespace-nowrap">{`${pkg.packageType === 'rb1' ? 'BLUS30050' : 'BLUS30463'}/USRDIR/${pkg.name}`}</p>}
                         </div>

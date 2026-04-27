@@ -70,7 +70,7 @@ export const initRichPresence = async (): Promise<never> => {
       return true
     } catch (err) {
       const win = getBrowserWindowFromEvent(event)
-      sendMessageBox(win, { type: 'error', method: 'initRichPresence', code: 'login' })
+      sendMessageBox(win, { type: 'error', code: 'initRichPresenceLogin' })
       isStarted = false
       return false
     }
@@ -83,7 +83,7 @@ export const initRichPresence = async (): Promise<never> => {
       prevHash = ''
       return true
     } else {
-      sendMessageBox(getBrowserWindowFromEvent(event), { type: 'error', method: 'initRichPresence', code: 'destroy' })
+      sendMessageBox(getBrowserWindowFromEvent(event), { type: 'error', code: 'initRichPresenceDestroy' })
       return false
     }
   })

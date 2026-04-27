@@ -93,7 +93,7 @@ export const texXboxPs3Stat = async (texFilePath: FilePathLikeTypes): Promise<Te
   srcBuffer.copy(fullSrcHeader, 0, 0, 16)
   srcBuffer.copy(shortSrcHeader, 0, 5, 11)
 
-  const { type, height, width } = await getDDSHeader(fullSrcHeader, shortSrcHeader)
+  const { type, height, width } = getDDSHeader(fullSrcHeader, shortSrcHeader)
   const ext = srcPath.ext.slice(1).toUpperCase()
 
   return {

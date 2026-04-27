@@ -26,7 +26,7 @@ export const texXboxPs3ToImage = async (srcFile: FilePathLikeTypes, destPath: Fi
   const fullHeader = srcBuffer.subarray(0, 16)
   const shortHeader = srcBuffer.subarray(5, 11)
 
-  const srcHeader = await getDDSHeader(fullHeader, shortHeader)
+  const srcHeader = getDDSHeader(fullHeader, shortHeader)
   const ddsStream = await dds.createWriteStream()
   ddsStream.write(srcHeader.data)
   ddsStream.end(srcContents)

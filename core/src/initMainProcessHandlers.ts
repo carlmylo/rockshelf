@@ -1,6 +1,6 @@
 import { shell, type BrowserWindow, type IpcMainInvokeEvent } from 'electron'
 import type { Promisable } from 'type-fest'
-import { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, editPackageData, getDTAFilteringFromPackage, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, playRockBand3, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectAndParseDTAFile, selectDevhdd0Dir, loadImageForCrop, selectPackageFiles, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig, cropImageAndSaveToTemp, createNewPackage, testBuzyLoad, getScoresFromGoCentral, extractMultitrackFromSong } from './controllers.exports'
+import { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, editPackageData, getDTAFilteringFromPackage, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, playRockBand3, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectAndParseDTAFile, selectDevhdd0Dir, loadImageForCrop, selectPackageFiles, selectPKGFile, selectRPCS3Exe, testUserConfig, cropImageAndSaveToTemp, createNewPackage, testBuzyLoad, getScoresFromGoCentral, extractMultitrackFromSong } from './controllers.exports'
 import { openUserDataFolder, readUserConfigFile, saveUserConfigFile, windowClose, windowMaximize, windowMinimize, type UserConfigObject } from './core.exports'
 import { addHandler } from './core/handler'
 
@@ -35,7 +35,7 @@ export const initMainProcessHandlers = (): void => {
     ['selectAndParseDTAFile', selectAndParseDTAFile],
     ['selectDevhdd0Dir', selectDevhdd0Dir],
     ['selectPackageFiles', selectPackageFiles],
-    ['selectPKGFileToInstall', selectPKGFileToInstall],
+    ['selectPKGFile', selectPKGFile],
     ['selectRPCS3Exe', selectRPCS3Exe],
     ['testBuzyLoad', testBuzyLoad],
     ['testError', (_, __, message?: string): Error => new Error(message || '')],

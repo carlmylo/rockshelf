@@ -124,7 +124,7 @@ export function DialogScreen() {
                       let newInstrumentScores: false | InstrumentScoreData = false
                       if (typeof saveData === 'object') newInstrumentScores = await window.api.rpcs3GetInstrumentScores(saveData)
                       setWindowState({ packages: newPackages, instrumentScores: newInstrumentScores })
-                      setMessageBoxState({ message: { type: 'success', method: 'deletePackage', code: '' } })
+                      setMessageBoxState({ message: { type: 'success', code: 'deletePackage' } })
                       resetDialogScreenState()
                     } catch (err) {
                       if (err instanceof Error) setWindowState({ err })

@@ -23,11 +23,11 @@ export const deletePackage = useHandler(async (win, __, pkgIndex: number) => {
   const pkgPath = DirPath.of(path)
 
   if (!pkgPath.exists) {
-    sendMessageBox(win, { type: 'error', method: 'deletePackage', code: 'packageNotFound' })
+    sendMessageBox(win, { type: 'error', code: 'deletePackagePackageNotFound' })
     return false
   }
 
-  sendMessageBox(win, { type: 'loading', method: 'deletePackage', code: 'deleting', messageValues: { pkgName: packageData.packageName, pkgPath: pkgPath.path } })
+  sendMessageBox(win, { type: 'loading', code: 'deletePackageDeleting', messageValues: { pkgName: packageData.packageName, pkgPath: pkgPath.path } })
   await pkgPath.deleteDir(true)
 
   cacheContents.packages.splice(pkgIndex, 1)

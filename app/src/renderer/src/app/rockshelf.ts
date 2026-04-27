@@ -6,7 +6,7 @@ export const TU5LINK = 'http://b0.ww.np.dl.playstation.net/tppkg/np/BLUS30463/BL
 export const PACKAGE_DETAILS_TABS = {
   SONGS: 0,
   DETAILS: 1,
-  EDIT_PACKAGE: 2,
+  OPTIONS: 2,
   FILTERS: 10,
 } as const
 
@@ -18,5 +18,5 @@ export const CREATE_NEW_PACKAGE_TABS = {
 export const SONG_DETAILS_TABS = {
   DETAILS: 0,
   LEADERBOARDS: 1,
-  MISC: 2,
+  OPTIONS: 2,
 } as const

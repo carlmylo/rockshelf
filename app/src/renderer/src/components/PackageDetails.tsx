@@ -1,4 +1,4 @@
-import { AnimatedDiv, AnimatedSection, TransComponent, animate, getReadableBytesSize } from '@renderer/lib.exports'
+import { AnimatedDiv, AnimatedSection, TransComponent, animate, getReadableBytesSize, uppercaseFirstLetter } from '@renderer/lib.exports'
 import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 import { useEffect, useMemo } from 'react'
 import { useWindowState } from '@renderer/stores/Window.state'
@@ -64,7 +64,7 @@ export function PackageDetails() {
 
   useEffect(
     function resetEditPackageState() {
-      if (typeof active === 'object' && active && packageDetailsTab === PACKAGE_DETAILS_TABS.EDIT_PACKAGE) {
+      if (typeof active === 'object' && active && packageDetailsTab === PACKAGE_DETAILS_TABS.OPTIONS) {
         setMyPackagesScreenState({ editPackageName: active.packageData.packageName, editPackageEdited: false })
       }
     },
@@ -73,7 +73,7 @@ export function PackageDetails() {
 
   useEffect(
     function warnNonSavedChangesOnPackageEdit() {
-      if (packageDetailsTab !== PACKAGE_DETAILS_TABS.EDIT_PACKAGE && editPackageEdited) setMessageBoxState({ message: { type: 'warn', method: '', code: 'nonSavedChangesOnEditPackage' } })
+      if (packageDetailsTab !== PACKAGE_DETAILS_TABS.OPTIONS && editPackageEdited) setMessageBoxState({ message: { type: 'warn', code: 'nonSavedChangesOnEditPackage' } })
     },
     [packageDetailsTab]
   )
@@ -83,14 +83,12 @@ export function PackageDetails() {
       {active !== null && catalog !== false && (
         <>
           <div className="flex-row! items-center border-b border-white/15 pb-2">
-            <div>
-              <img src={disableImg === selPKG ? undefined : active.thumbnailSrc} className="mr-2 h-32 min-h-32 w-32 min-w-32 border-2 border-neutral-700" />
-              {typeof instrumentScores === 'object' && <img title={t(instrumentScores.instrument)} src={`instrumenticons://${instrumentScores.instrument.toLowerCase()}`} className="absolute! -right-[0.3rem] -bottom-[0.3rem] mr-2 h-6 w-6 opacity-95" />}
-            </div>
+            <img src={disableImg === selPKG ? undefined : active.thumbnailSrc} className="mr-2 h-32 min-h-32 w-32 min-w-32 border-2 border-neutral-700" />
 
             <div className="mr-auto h-full">
               <h1 className="font-pentatonicalt! text-[2rem]">{active.packageData.packageName}</h1>
-              <p>{t(active.songs.length === 1 ? 'songCount' : 'songCountPlural', { count: active.songs.length })}</p>
+              <p>{t(active.songs.length === 1 ? 'songsCount' : 'songsCountPlural', { count: active.songs.length })}</p>
+              <p>{t('sortText', { sortType: t(`sort${uppercaseFirstLetter(catalogSortBy)}`) })}</p>
             </div>
             <button
               disabled={disableButtons}
@@ -125,12 +123,12 @@ export function PackageDetails() {
               <>
                 <button
                   disabled={disableButtons}
-                  className={clsx(packageDetailsTab === PACKAGE_DETAILS_TABS.EDIT_PACKAGE ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+                  className={clsx(packageDetailsTab === PACKAGE_DETAILS_TABS.OPTIONS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
                   onClick={() => {
-                    setMyPackagesScreenState({ packageDetailsTab: PACKAGE_DETAILS_TABS.EDIT_PACKAGE })
+                    setMyPackagesScreenState({ packageDetailsTab: PACKAGE_DETAILS_TABS.OPTIONS })
                   }}
                 >
-                  {t('editPackage')}
+                  {t('options')}
                 </button>
               </>
             )}
@@ -164,7 +162,7 @@ export function PackageDetails() {
                           <div className="w-full">
                             <div className="sticky! top-0 z-100 mb-1 w-full flex-row! items-center rounded-b-sm bg-neutral-900 px-2 py-1">
                               <h1 className="mr-auto text-lg uppercase">{catalog.type === 'yearReleased' ? header.name : t(header.code)}</h1>
-                              <p className="font-pentatonic text-neutral-500 uppercase">{t(header.songsIndexes.length === 1 ? 'songCount' : 'songCountPlural', { count: header.songsIndexes.length })}</p>
+                              <p className="font-pentatonic text-neutral-500 uppercase">{t(header.songsIndexes.length === 1 ? 'songsCount' : 'songsCountPlural', { count: header.songsIndexes.length })}</p>
                             </div>
                             {header.songsIndexes.map((songIndex, songIndexKey) => {
                               const song = active.songs[songIndex]
@@ -213,7 +211,7 @@ export function PackageDetails() {
                           <div className="w-full">
                             <div className="sticky! top-0 z-100 mb-1 w-full flex-row! items-center rounded-b-sm bg-neutral-900 px-2 py-1">
                               <h1 className="mr-auto text-lg uppercase">{header.name}</h1>
-                              <p className="font-pentatonic text-neutral-500 uppercase">{t(header.songsCount === 1 ? 'songCount' : 'songCountPlural', { count: header.songsCount })}</p>
+                              <p className="font-pentatonic text-neutral-500 uppercase">{t(header.songsCount === 1 ? 'songsCount' : 'songsCountPlural', { count: header.songsCount })}</p>
                             </div>
                             {header.albums.map((album) => {
                               return (
@@ -221,7 +219,7 @@ export function PackageDetails() {
                                   <div className="w-full">
                                     <div className="sticky! top-7.25 z-99 mb-1 w-full flex-row! items-center bg-cyan-950 px-2 py-1">
                                       <h1 className="mr-auto text-lg uppercase">{album.name}</h1>
-                                      <p className="font-pentatonic text-neutral-500 uppercase">{t(album.songsIndexes.length === 1 ? 'songCount' : 'songCountPlural', { count: album.songsIndexes.length })}</p>
+                                      <p className="font-pentatonic text-neutral-500 uppercase">{t(album.songsIndexes.length === 1 ? 'songsCount' : 'songsCountPlural', { count: album.songsIndexes.length })}</p>
                                     </div>
 
                                     {album.songsIndexes.map((songIndex, songIndexKey) => {
@@ -315,21 +313,25 @@ export function PackageDetails() {
           {packageDetailsTab === PACKAGE_DETAILS_TABS.DETAILS && (
             <>
               <div className="h-full w-full overflow-y-auto">
-                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
-                  <h1 className="mb-1 uppercase">{t('packagePath')}</h1>
-                  <p className="mb-4 font-mono text-xs italic">{active.path}</p>
-                  <div className="flex-row! items-center">
-                    <button
-                      disabled={disableButtons}
-                      className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                      onClick={async () => {
-                        await window.api.openFolderInExplorer(active.path)
-                      }}
-                    >
-                      {t('openPackageFolder')}
-                    </button>
-                  </div>
-                </div>
+                {active.official?.code !== 'rb3' && (
+                  <>
+                    <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                      <h1 className="mb-1 uppercase">{t('packagePath')}</h1>
+                      <p className="mb-4 font-mono text-xs italic">{active.path}</p>
+                      <div className="flex-row! items-center">
+                        <button
+                          disabled={disableButtons}
+                          className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                          onClick={async () => {
+                            await window.api.openFolderInExplorer(active.path)
+                          }}
+                        >
+                          {t('openPackageFolder')}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
                   <h1 className="mb-1 uppercase">{t('packageSize')}</h1>
                   <p className="text-xs italic">{getReadableBytesSize(active.packageSize)}</p>
@@ -345,9 +347,9 @@ export function PackageDetails() {
                         onClick={async () => {
                           try {
                             await navigator.clipboard.writeText(active.contentsHash)
-                            setMessageBoxState({ message: { type: 'info', method: 'packageHash', code: 'copiedToClipboard' } })
+                            setMessageBoxState({ message: { type: 'info', code: 'packageHashCopiedToClipboard' } })
                           } catch (err) {
-                            setMessageBoxState({ message: { type: 'error', method: 'packageHash', code: 'copiedToClipboard' } })
+                            setMessageBoxState({ message: { type: 'error', code: 'packageHashCopiedToClipboard' } })
                           }
                         }}
                       >
@@ -360,74 +362,76 @@ export function PackageDetails() {
             </>
           )}
 
-          {packageDetailsTab === PACKAGE_DETAILS_TABS.EDIT_PACKAGE && (
+          {packageDetailsTab === PACKAGE_DETAILS_TABS.OPTIONS && (
             <>
-              <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
-                <h1 className="mb-1 uppercase">{t('packageName')}</h1>
-                <p className="mb-4 text-xs italic">
-                  <TransComponent i18nKey="changePackageNameDesc" />
-                </p>
-                <input className="mb-1 rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! duration-100 last:mb-0 hover:bg-neutral-700 focus:border-white/25 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900" value={editPackageName} onChange={(ev) => setMyPackagesScreenState({ editPackageEdited: true, editPackageName: ev.target.value })} minLength={1} maxLength={64} />
-              </div>
+              <div className="h-full w-full overflow-y-auto">
+                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                  <h1 className="mb-1 uppercase">{t('packageName')}</h1>
+                  <p className="mb-4 text-xs italic">
+                    <TransComponent i18nKey="changePackageNameDesc" />
+                  </p>
+                  <input className="mb-1 rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-sm! duration-100 last:mb-0 hover:bg-neutral-700 focus:border-white/25 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900" value={editPackageName} onChange={(ev) => setMyPackagesScreenState({ editPackageEdited: true, editPackageName: ev.target.value })} minLength={1} maxLength={64} />
+                </div>
 
-              <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
-                <h1 className="mb-1 uppercase">{t('packageThumbnail')}</h1>
-                <p className="mb-4 text-xs italic">
-                  <TransComponent i18nKey="changePackageThumbnailDesc" />
-                </p>
-                <div className="flex-row! items-center">
+                <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
+                  <h1 className="mb-1 uppercase">{t('packageThumbnail')}</h1>
+                  <p className="mb-4 text-xs italic">
+                    <TransComponent i18nKey="changePackageThumbnailDesc" />
+                  </p>
+                  <div className="flex-row! items-center">
+                    <button
+                      disabled={disableButtons}
+                      className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                      onClick={async () => {
+                        setWindowState({ disableButtons: true })
+                        try {
+                          const imgStats = await window.api.loadImageForCrop(active.path)
+                          if (imgStats) {
+                            setImageCropScreenState({ imgPath: imgStats.path, imgDataURL: imgStats.dataURL, func: 'packageDetails' })
+                            setMessageBoxState({ message: null })
+                          }
+                        } catch (err) {
+                          if (err instanceof Error) setWindowState({ err })
+                        }
+                        setWindowState({ disableButtons: false })
+                      }}
+                    >
+                      {t('selectImgFile')}
+                    </button>
+                    <button
+                      disabled={disableButtons}
+                      className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                      onClick={async () => {
+                        setRBIconsSelectorState({ active: 'editPackage' })
+                      }}
+                    >
+                      {t('selectRBIcons')}
+                    </button>
+                  </div>
+                </div>
+
+                <AnimatedDiv condition={editPackageEdited} {...animate({ opacity: true })}>
                   <button
-                    disabled={disableButtons}
-                    className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                    onClick={async () => {
+                    className="mb-1 w-fit rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                    onClick={async (ev) => {
                       setWindowState({ disableButtons: true })
                       try {
-                        const imgStats = await window.api.loadImageForCrop(active.path)
-                        if (imgStats) {
-                          setImageCropScreenState({ imgPath: imgStats.path, imgDataURL: imgStats.dataURL, func: 'packageDetails' })
-                          setMessageBoxState({ message: null })
-                        }
+                        const newPackages = await window.api.editPackageData(selPKG, { packageName: editPackageName })
+                        console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', newPackages)
+
+                        if (newPackages) setWindowState({ packages: newPackages })
+                        setMyPackagesScreenState({ editPackageEdited: false })
+                        setMessageBoxState({ message: { type: 'success', code: 'savePackageEditing' } })
                       } catch (err) {
                         if (err instanceof Error) setWindowState({ err })
                       }
                       setWindowState({ disableButtons: false })
                     }}
                   >
-                    {t('selectImgFile')}
+                    {t('save')}
                   </button>
-                  <button
-                    disabled={disableButtons}
-                    className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                    onClick={async () => {
-                      setRBIconsSelectorState({ active: 'editPackage' })
-                    }}
-                  >
-                    {t('selectRBIcons')}
-                  </button>
-                </div>
+                </AnimatedDiv>
               </div>
-
-              <AnimatedDiv condition={editPackageEdited} {...animate({ opacity: true })}>
-                <button
-                  className="mb-1 w-fit rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                  onClick={async (ev) => {
-                    setWindowState({ disableButtons: true })
-                    try {
-                      const newPackages = await window.api.editPackageData(selPKG, { packageName: editPackageName })
-                      console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', newPackages)
-
-                      if (newPackages) setWindowState({ packages: newPackages })
-                      setMyPackagesScreenState({ editPackageEdited: false })
-                      setMessageBoxState({ message: { type: 'success', method: 'savePackageEditing', code: '' } })
-                    } catch (err) {
-                      if (err instanceof Error) setWindowState({ err })
-                    }
-                    setWindowState({ disableButtons: false })
-                  }}
-                >
-                  {t('save')}
-                </button>
-              </AnimatedDiv>
             </>
           )}
 

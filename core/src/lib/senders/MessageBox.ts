@@ -14,10 +14,6 @@ export interface MessageBoxObject {
    */
   code: string
   /**
-   * The name of the function/controller where the error originated from.
-   */
-  method: string
-  /**
    * The amount of time (in milliseconds) that the message will disappear. Default is `4000` (4secs).
    */
   timeout?: number

@@ -1,4 +1,4 @@
-import { AnimatedDiv, AnimatedSection, TransComponent, animate, formatNumberWithDots } from '@renderer/lib.exports'
+import { AnimatedDiv, AnimatedSection, TransComponent, animate, formatNumberWithDots, rankCalculator, underscoreToUppercaseLetter } from '@renderer/lib.exports'
 import { useMyPackagesScreenState } from './MyPackagesScreen.state'
 import { useWindowState } from '@renderer/stores/Window.state'
 import { useEffect, useMemo } from 'react'
@@ -9,8 +9,26 @@ import { useShallow } from 'zustand/shallow'
 import { SONG_DETAILS_TABS } from '@renderer/app/rockshelf'
 import { useUserConfigState } from '@renderer/stores/UserConfig.state'
 import { StarsInline } from './PackageDetails'
-import { bandIcon, guitarIcon, bassIcon, drumsIcon, keysIcon, vocalsIcon, proGuitarIcon, proBassIcon, proDrumsIcon, proKeysIcon, harm3Icon } from '@renderer/assets/images'
+import { bandIcon, guitarIcon, bassIcon, drumsIcon, keysIcon, vocalsIcon, proGuitarIcon, proBassIcon, proDrumsIcon, proKeysIcon, harm3Icon, diffDotOn, diffDotOff, diffDotDevil } from '@renderer/assets/images'
 
+export function DiffIconInline({ diff, width }: { diff: number; width?: number }) {
+  const { t, i18n } = useTranslation()
+  console.log(i18n.language)
+  return (
+    <div className="mr-auto w-22.5 max-w-22.5 flex-row! items-center last:mr-0" title={t(diff === -1 ? 'noPart' : `diff${diff}`)}>
+      {diff > -1 && (
+        <>
+          <img src={diff === 6 ? diffDotDevil : diff >= 1 ? diffDotOn : diffDotOff} style={{ width: `${width || 4}rem` }} />
+          <img src={diff === 6 ? diffDotDevil : diff >= 2 ? diffDotOn : diffDotOff} style={{ width: `${width || 4}rem` }} />
+          <img src={diff === 6 ? diffDotDevil : diff >= 3 ? diffDotOn : diffDotOff} style={{ width: `${width || 4}rem` }} />
+          <img src={diff === 6 ? diffDotDevil : diff >= 4 ? diffDotOn : diffDotOff} style={{ width: `${width || 4}rem` }} />
+          <img src={diff === 6 ? diffDotDevil : diff >= 5 ? diffDotOn : diffDotOff} style={{ width: `${width || 4}rem` }} />
+        </>
+      )}
+      {diff === -1 && <h1 className={clsx('uppercase', i18n.language === 'pt-BR' && 'text-[0.87rem]', i18n.language === 'en-US' && 'text-lg', i18n.language === 'es-419' && 'text-[0.95rem]')}>{t('noPart')}</h1>}
+    </div>
+  )
+}
 export function SongDetails() {
   const { t } = useTranslation()
   const { selPKG, selSong, isArtworkLoading, artworkURL, songDetailsTab, songLeaderboards, setMyPackagesScreenState } = useMyPackagesScreenState(useShallow((x) => ({ selPKG: x.selPKG, selSong: x.selSong, isArtworkLoading: x.isArtworkLoading, artworkURL: x.artworkURL, setMyPackagesScreenState: x.setMyPackagesScreenState, songDetailsTab: x.songDetailsTab, songLeaderboards: x.songLeaderboards })))
@@ -148,19 +166,53 @@ export function SongDetails() {
               <>
                 <button
                   disabled={disableButtons}
-                  className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.MISC ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
+                  className={clsx('flex-row! items-center', songDetailsTab === SONG_DETAILS_TABS.OPTIONS ? 'bg-yellow-500 text-black/90 hover:bg-yellow-400 active:bg-yellow-300' : 'hover:text-neutral-300 active:text-neutral-200', 'h-full w-fit justify-center px-2 duration-200')}
                   onClick={() => {
-                    setMyPackagesScreenState({ songDetailsTab: SONG_DETAILS_TABS.MISC })
+                    setMyPackagesScreenState({ songDetailsTab: SONG_DETAILS_TABS.OPTIONS })
                   }}
                 >
-                  {t('misc')}
+                  {t('options')}
                 </button>
               </>
             )}
           </div>
           {songDetailsTab === SONG_DETAILS_TABS.DETAILS && (
             <>
-              <div className="h-full w-full overflow-y-auto"></div>
+              <div className="h-full w-full overflow-y-auto">
+                <h1>Song Entry</h1>
+                <p>{songDetails.id}</p>
+                <h1>Internal name</h1>
+                <p>{songDetails.songname}</p>
+                <h1>Song ID</h1>
+                <p className="mb-8">{songDetails.song_id}</p>
+
+                <div className="mt-auto px-16">
+                  <div className="flex-row! items-center">
+                    <img src="instrumenticons://guitar" title={t('guitar')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('guitar', songDetails.rank_guitar)} />
+                    <img src="instrumenticons://bass" title={t('bass')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('bass', songDetails.rank_bass)} />
+                    <img src="instrumenticons://drums" title={t('drums')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('drum', songDetails.rank_drum)} />
+                    <img src="instrumenticons://keys" title={t('keys')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('keys', songDetails.rank_keys)} />
+                    <img src="instrumenticons://vocals" title={t('vocals')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('vocals', songDetails.rank_vocals)} />
+                  </div>
+                  <div className="flex-row! items-center">
+                    <img src="instrumenticons://proGuitar" title={t('proGuitar')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('real_guitar', songDetails.rank_real_guitar)} />
+                    <img src="instrumenticons://proBass" title={t('proBass')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('real_bass', songDetails.rank_real_bass)} />
+                    <img src="instrumenticons://proDrums" title={t('proDrums')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('drum', songDetails.rank_drum)} />
+                    <img src="instrumenticons://proKeys" title={t('proKeys')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('real_keys', songDetails.rank_real_keys)} />
+                    <img src={songDetails.vocal_parts === 2 ? 'instrumenticons://harm2' : 'instrumenticons://harmonies'} title={t(songDetails.vocal_parts === 2 ? 'harm2' : 'harm3')} className="mr-1 h-8 w-8" />
+                    <DiffIconInline width={1.1} diff={rankCalculator('vocals', songDetails.rank_vocals)} />
+                  </div>
+                </div>
+              </div>
             </>
           )}
           {songDetailsTab === SONG_DETAILS_TABS.LEADERBOARDS && (
@@ -429,38 +481,131 @@ export function SongDetails() {
             </>
           )}
 
-          {/* {songDetailsTab === SONG_DETAILS_TABS.MISC && (
+          {songDetailsTab === SONG_DETAILS_TABS.OPTIONS && (
             <>
               <div className="h-full w-full overflow-y-auto">
                 <div className="group mb-2 rounded-xs p-3 duration-200 last:mb-0 hover:bg-white/5">
-                  <h1 className="mb-1 uppercase">{t('extractMultitrack')}</h1>
-                  <p className="mb-4 text-xs italic">
-                    <TransComponent i18nKey="extractMultitrackDesc" />
-                  </p>
-
                   <div className="flex-row! items-center">
-                    <button
-                      disabled={disableButtons}
-                      className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
-                      onClick={async () => {
-                        setWindowState({ disableButtons: true })
-                        if (packageDetails) {
-                          try {
-                            await window.api.extractMultitrackFromSong(packageDetails.path, songDetails)
-                          } catch (err) {
-                            if (err instanceof Error) setWindowState({ err })
-                          }
-                        }
-                        setWindowState({ disableButtons: false })
-                      }}
-                    >
-                      {t('extract')}
-                    </button>
+                    <h1 className="mr-auto mb-1 uppercase">{t('audioTracks')}</h1>
+                    <p>{songDetails.multitrack === null || songDetails.multitrack === undefined ? 'mtSingleTrack' : `mt${underscoreToUppercaseLetter(songDetails.multitrack, true)}`}</p>
                   </div>
+                  {allTracksCount !== undefined && (
+                    <p className="mb-4 text-xs italic">
+                      <TransComponent i18nKey={allTracksCount === 1 ? 'tracksCount' : 'tracksCountPlural'} values={{ allTracksCount }} />
+                    </p>
+                  )}
+                  <div className="mb-2 h-8 w-full flex-row! items-center">
+                    {songDetails.tracks_count[0] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('drums')}>
+                        {Array(songDetails.tracks_count[0])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`drumsAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-[#207818]"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticonscolor://drums" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[1] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('bass')}>
+                        {Array(songDetails.tracks_count[1])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`bassAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-[#940000]"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticonscolor://bass" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[2] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('guitar')}>
+                        {Array(songDetails.tracks_count[2])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`guitarAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-[#bfa00b]"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticonscolor://guitar" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[3] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('vocals2')}>
+                        {Array(songDetails.tracks_count[3])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`vocalsAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-[#0561cb]"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticonscolor://vocals" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[4] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('keys')}>
+                        {Array(songDetails.tracks_count[4])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`keysAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-[#ca6400]"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticonscolor://keys" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[5] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('backing')}>
+                        {Array(songDetails.tracks_count[5])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`backingAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-black"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticons://backing" width={24} />
+                        </div>
+                      </div>
+                    )}
+                    {songDetails.tracks_count[6] && songDetails.tracks_count[6] > 0 && (
+                      <div className="relative! h-full flex-row! rounded-sm border border-transparent duration-200 hover:border-neutral-300" title={t('crowd')}>
+                        {Array(songDetails.tracks_count[6])
+                          .fill(0)
+                          .map((_, arrIndex) => {
+                            return <div key={`crowdAudio${arrIndex}`} className="h-full w-12 rounded-sm border border-neutral-800/80 bg-black"></div>
+                          })}
+                        <div className="absolute! h-full w-full items-center justify-center">
+                          <img src="instrumenticons://crowd" width={24} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    className="mb-1 w-fit rounded-xs border border-neutral-800 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mb-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+                    onClick={async (ev) => {
+                      setWindowState({ disableButtons: true })
+                      if (packageDetails) {
+                        try {
+                          await window.api.extractMultitrackFromSong(packageDetails.path, songDetails)
+                          // const newPackages = await window.api.editPackageData(selPKG, { packageName: editPackageName })
+                          // console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', newPackages)
+                          // if (newPackages) setWindowState({ packages: newPackages })
+                          // setMyPackagesScreenState({ editPackageEdited: false })
+                          // setMessageBoxState({ message: { type: 'success', code: 'savePackageEditing' } })
+                        } catch (err) {
+                          if (err instanceof Error) setWindowState({ err })
+                        }
+                      }
+                      setWindowState({ disableButtons: false })
+                    }}
+                  >
+                    {t('extractTracks')}
+                  </button>
                 </div>
               </div>
             </>
-          )} */}
+          )}
         </>
       )}
     </AnimatedSection>

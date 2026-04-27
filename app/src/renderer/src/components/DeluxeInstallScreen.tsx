@@ -90,16 +90,22 @@ export function DeluxeInstallScreen() {
             setWindowState({ disableButtons: true })
             setDeluxeInstallScreenState({ selectedPKG: 'loading' })
             try {
-              const newSelectedPKG = await window.api.selectPKGFileToInstall()
-              console.log('struct SelectPKGFileReturnObject [core/src/controllers/selectPKGFileToInstall.ts]', newSelectedPKG)
+              const newSelectedPKG = await window.api.selectPKGFile()
+              console.log('struct SelectPKGFileReturnObject [core/src/controllers/selectPKGFile.ts]', newSelectedPKG)
 
               if (!newSelectedPKG) {
                 setWindowState({ disableButtons: false })
                 setDeluxeInstallScreenState({ selectedPKG: null })
                 return
               }
+              if (newSelectedPKG.pkgType === 'tu5') {
+                setMessageBoxState({ message: { type: 'error', code: 'selectPKGFileTUNotSupported' } })
+                setDeluxeInstallScreenState({ selectedPKG: null })
+                setWindowState({ disableButtons: false })
+                return
+              }
               if (newSelectedPKG.pkgType !== 'dx') {
-                setMessageBoxState({ message: { code: 'notDXPKG', type: 'error', method: 'selectDXPKGFileToInstall', messageValues: { path: newSelectedPKG.pkgPath } } })
+                setMessageBoxState({ message: { code: 'selectPKGFileNotDXPKG', type: 'error', messageValues: { path: newSelectedPKG.pkgPath } } })
                 setDeluxeInstallScreenState({ selectedPKG: null })
                 setWindowState({ disableButtons: false })
                 return

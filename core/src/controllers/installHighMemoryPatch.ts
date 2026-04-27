@@ -15,6 +15,6 @@ export const installHighMemoryPatch = useHandler(async (win, _): Promise<boolean
   if (!usrdir.exists) await usrdir.mkDir(true)
   const highMemoryDTAFile = usrdir.gotoFile('dx_high_memory.dta')
   await highMemoryDTAFile.write('(dx_high_memory 190000000)\n(dx_song_count 16000)\n')
-  sendMessageBox(win, { type: 'success', method: 'installHighMemoryPatch', code: '' })
+  sendMessageBox(win, { type: 'success', code: 'installHighMemoryPatch' })
   return true
 })

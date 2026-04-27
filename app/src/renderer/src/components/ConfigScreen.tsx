@@ -79,7 +79,7 @@ export function ConfigScreen() {
                   await window.api.saveUserConfigFile(newConfig)
                   const newRB3Stats = (await window.api.rpcs3GetRB3Stats()) as RockBand3Data
                   setWindowState({ disableButtons: false, rb3Stats: newRB3Stats })
-                  setMessageBoxState({ message: { type: 'success', method: 'changedDevhdd0Dir', code: '' } })
+                  setMessageBoxState({ message: { type: 'success', code: 'changedDevhdd0Dir' } })
                 } catch (err) {
                   if (err instanceof Error) setWindowState({ err })
                 }
@@ -112,7 +112,7 @@ export function ConfigScreen() {
                   const newConfig = getUserConfigState()
                   await window.api.saveUserConfigFile(newConfig)
                   setWindowState({ disableButtons: false })
-                  setMessageBoxState({ message: { type: 'success', method: 'changedRPCS3ExeFile', code: '' } })
+                  setMessageBoxState({ message: { type: 'success', code: 'changedRPCS3ExeFile' } })
                 } catch (err) {
                   if (err instanceof Error) setWindowState({ err })
                 }
@@ -338,12 +338,12 @@ export function ConfigScreen() {
             className="mb-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
             onClick={async () => {
               setWindowState({ disableButtons: true })
-              setMessageBoxState({ message: { type: 'loading', method: 'recreatePackagesCacheFile', code: '' } })
+              setMessageBoxState({ message: { type: 'loading', code: 'recreatePackagesCacheFile' } })
               try {
                 const newPackagesData = await window.api.rpcs3GetPackagesData(true)
                 console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', newPackagesData)
                 setWindowState({ packages: newPackagesData, disableButtons: false })
-                setMessageBoxState({ message: { type: 'success', method: 'recreatePackagesCacheFile', code: '' } })
+                setMessageBoxState({ message: { type: 'success', code: 'recreatePackagesCacheFile' } })
               } catch (err) {
                 if (err instanceof Error) setWindowState({ err })
               }

@@ -154,41 +154,70 @@ export const buildDDSHeader = (format: DDSFormatTypes, width: number, height: nu
  * @param {Buffer} shortDDSHeader Bytes 5-16 of the DDS file.
  *
  * _Some games have a bunch of headers for the same files. Bytes 5-16 has only the dimensions and image format._
- * @returns {Promise<DDSHeaderParserObject>} An object with the header data and values.
+ * @returns {DDSHeaderParserObject} An object with the header data and values.
  */
-export const getDDSHeader = async (fullDDSHeader: Buffer, shortDDSHeader: Buffer): Promise<DDSHeaderParserObject> => {
-  let header = buildDDSHeader('DXT1', 256, 256)
-  const headerPaths = await RBTools.headersFolder.readDir()
-  let ddsFormat: DDSFormatTypes = 'UNKNOWN'
-  let ddsWidth: ArtworkSizeTypes = 512
-  let ddsHeight: ArtworkSizeTypes = 512
+export const getDDSHeader = (fullDDSHeader: Buffer, shortDDSHeader: Buffer): DDSHeaderParserObject => {
+  let header = buildDDSHeader('DXT5', 256, 256)
+  let format: DDSFormatTypes = 'DXT5'
+  let size: ArtworkSizeTypes = 512
 
-  for (const headerPath of headerPaths) {
-    if (headerPath instanceof DirPath) continue
-    const headerFilePath = pathLikeToFilePath(headerPath)
-    const headerName = headerFilePath.name
-    const headerBytes = await headerFilePath.read()
-    if (headerBytes.toString() === fullDDSHeader.toString() || headerBytes.toString() === shortDDSHeader.toString()) {
-      ddsFormat = 'DXT5'
-      if (headerName.includes('DXT1')) ddsFormat = 'DXT1'
-      else if (headerName.includes('NORMAL')) ddsFormat = 'NORMAL'
+  const headers: [string, DDSFormatTypes, ArtworkSizeTypes][] = [
+    ['AQQIAAAAA4AAgABAAAAAAA==', 'DXT1', 128],
+    ['AQgYAAAAA4AAgACAAAAAAA==', 'DXT5', 128],
+    ['AQggAAAAA4AAgACAAAAAAA==', 'NORMAL', 128],
+    ['AQQIAAAABAABAAGAAAAAAA==', 'DXT1', 256],
+    // ['AQgYAAAAAAABAAEAAQAAAA==', 'DXT5', 256], // No MIP
+    ['AQgYAAAABAABAAEAAQAAAA==', 'DXT5', 256],
+    ['AQQIAAAABQACAAIAAQAAAA==', 'DXT1', 512],
+    ['AQgYAAAABQACAAIAAgAAAA==', 'DXT5', 512],
+    ['AQQIAAAABQAEAAQABAAAAA==', 'DXT1', 1024],
+    ['AQgYAAAABQAEAAQABAAAAA==', 'DXT5', 1024],
+    ['AQQIAAAABgAIAAgACAAAAA==', 'DXT1', 2048],
+    ['AQgYAAAABgAIAAgACAAAAA==', 'DXT5', 2048],
+  ]
 
-      let index1 = headerName.indexOf('_') + 1
-      let index2 = headerName.indexOf('x')
-      const width = parseInt(headerName.substring(index1, index2))
-      ddsWidth = width as ArtworkSizeTypes
-      index1 = headerName.indexOf('_', index2)
-      index2++
-      const height = parseInt(headerName.substring(index2, index1))
-      ddsHeight = height as ArtworkSizeTypes
-      header = buildDDSHeader(ddsFormat as DDSFormatTypes, width, height)
+  for (const buf of headers) {
+    if (buf[0] === fullDDSHeader.toString('base64')) {
+      const [_, fmt, sz] = buf
+      format = fmt
+      size = sz
+      header = buildDDSHeader(format, size, size)
+      break
     }
   }
 
+  // [CHANGED]
+  // const headerPaths = await RBTools.headersFolder.readDir()
+  // let ddsFormat: DDSFormatTypes = 'UNKNOWN'
+  // let ddsWidth: ArtworkSizeTypes = 512
+  // let ddsHeight: ArtworkSizeTypes = 512
+
+  // for (const headerPath of headerPaths) {
+  //   if (headerPath instanceof DirPath) continue
+  //   const headerName = headerPath.name
+  //   const headerBytes = await headerPath.read()
+  //   if (headerBytes.toString() === fullDDSHeader.toString() || headerBytes.toString() === shortDDSHeader.toString()) {
+  //     ddsFormat = 'DXT5'
+  //     if (headerName.includes('DXT1')) ddsFormat = 'DXT1'
+  //     else if (headerName.includes('NORMAL')) ddsFormat = 'NORMAL'
+
+  //     let index1 = headerName.indexOf('_') + 1
+  //     let index2 = headerName.indexOf('x')
+  //     const width = parseInt(headerName.substring(index1, index2))
+  //     ddsWidth = width as ArtworkSizeTypes
+  //     index1 = headerName.indexOf('_', index2)
+  //     index2++
+  //     const height = parseInt(headerName.substring(index2, index1))
+  //     ddsHeight = height as ArtworkSizeTypes
+  //     console.log(headerName, ddsFormat, width, height, headerBytes.subarray(0, 0x10))
+  //     header = buildDDSHeader(ddsFormat as DDSFormatTypes, width, height)
+  //   }
+  // }
+
   return {
-    type: ddsFormat,
-    width: ddsWidth,
-    height: ddsHeight,
+    type: format,
+    width: size,
+    height: size,
     data: header,
   }
 }

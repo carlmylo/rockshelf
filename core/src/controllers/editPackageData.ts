@@ -23,7 +23,7 @@ export const editPackageData = useHandler(async (win, _, pkgIndex: number, optio
   const pkgPath = DirPath.of(path)
 
   if (!pkgPath.exists) {
-    sendMessageBox(win, { type: 'error', method: 'editPackageData', code: 'packageNotFound' })
+    sendMessageBox(win, { type: 'error', code: 'editPackageDataPackageNotFound' })
     return false
   }
 

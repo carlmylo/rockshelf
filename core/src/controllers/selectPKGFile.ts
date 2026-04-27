@@ -35,15 +35,11 @@ export interface SelectPKGFileReturnObject {
 /**
  * Opens a prompt to select a PKG file and retrieve data from the selected PKG file.
  */
-export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectPKGFileReturnObject | false> => {
+export const selectPKGFile = useHandler(async (win, _): Promise<SelectPKGFileReturnObject | false> => {
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'pkgFile'), extensions: ['pkg'] }] })
 
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'selectPKGFileToInstall',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'selectPKGFileCancelledByUser' })
     return false
   }
 
@@ -53,12 +49,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   try {
     await pkg.checkFileIntegrity()
   } catch (err) {
-    sendMessageBox(win, {
-      type: 'error',
-      method: 'selectPKGFileToInstall',
-      code: 'invalidFileSignature',
-      messageValues: { path: pkg.path.path },
-    })
+    sendMessageBox(win, { type: 'error', code: 'selectPKGFileInvalidFileSignature', messageValues: { path: pkg.path.path } })
     return false
   }
 
@@ -69,13 +60,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   let dxHash: string | undefined
 
   if (stat.titleID === 'BLUS30050' && !official) {
-    sendMessageBox(win, {
-      type: 'error',
-      method: 'selectPKGFileToInstall',
-      code: 'rb2PKGNotAllowed',
-      timeout: 6000,
-      messageValues: { path: pkg.path.path },
-    })
+    sendMessageBox(win, { type: 'error', code: 'selectPKGFileRB2PKGNotAllowed', timeout: 6000, messageValues: { path: pkg.path.path } })
 
     return false
   } else if ((stat.titleID === 'BLUS30050' || stat.titleID === 'BLUS30463') && official) pkgType = official.code
@@ -85,12 +70,7 @@ export const selectPKGFileToInstall = useHandler(async (win, _): Promise<SelectP
   }
 
   if (stat.titleID !== 'BLUS30463' && stat.titleID !== 'BLUS30050') {
-    sendMessageBox(win, {
-      type: 'error',
-      method: 'selectPKGFileToInstall',
-      code: 'notRockBandPKG',
-      messageValues: { path: pkg.path.path },
-    })
+    sendMessageBox(win, { type: 'error', code: 'selectPKGFileNotRockBandPKG', messageValues: { path: pkg.path.path } })
 
     return false
   }

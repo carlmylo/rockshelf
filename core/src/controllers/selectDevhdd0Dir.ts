@@ -8,11 +8,7 @@ import { isRPCS3Devhdd0PathValid } from '../lib/rbtools/lib.exports'
 export const selectDevhdd0Dir = useHandler(async (win): Promise<string | false> => {
   const selection = await dialog.showOpenDialog({ properties: ['openDirectory'] })
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'selectDevhdd0Dir',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'selectDevhdd0DirCancelledByUser' })
     return false
   }
 
@@ -20,12 +16,7 @@ export const selectDevhdd0Dir = useHandler(async (win): Promise<string | false> 
     const devhdd0 = isRPCS3Devhdd0PathValid(selection.filePaths[0])
     return devhdd0.path
   } catch (err) {
-    sendMessageBox(win, {
-      type: 'error',
-      method: 'selectDevhdd0Dir',
-      code: 'invalidFolder',
-      messageValues: { path: selection.filePaths[0] },
-    })
+    sendMessageBox(win, { type: 'error', code: 'selectDevhdd0DirInvalidFolder', messageValues: { path: selection.filePaths[0] } })
     return false
   }
 })

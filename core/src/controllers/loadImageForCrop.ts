@@ -15,19 +15,11 @@ export const loadImageForCrop = useHandler(async (win, _, defaultPath?: string):
   const selection = await dialog.showOpenDialog({ defaultPath, properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'supportedImageFiles'), extensions: ['jpg', 'jpeg', 'bmp', 'png', 'webp', 'png_xbox', 'png_ps3', 'png_wii'] }] })
 
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'LoadImageForCrop',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'loadImageForCropCancelledByUser' })
     return false
   }
 
-  sendMessageBox(win, {
-    type: 'info',
-    method: 'LoadImageForCrop',
-    code: 'processing',
-  })
+  sendMessageBox(win, { type: 'info', code: 'loadImageForCropProcessing' })
 
   const [imgFile] = selection.filePaths
 

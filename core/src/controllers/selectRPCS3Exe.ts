@@ -6,11 +6,7 @@ export const selectRPCS3Exe = useHandler(async (win, _): Promise<string | false>
   const rpcs3ExeFilterName = await getLocaleStringFromRenderer(win, 'rpcs3Exe')
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: rpcs3ExeFilterName, extensions: ['exe'] }] })
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'selectRPCS3Exe',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'selectRPCS3ExeCancelledByUser' })
     return false
   }
 
@@ -18,12 +14,7 @@ export const selectRPCS3Exe = useHandler(async (win, _): Promise<string | false>
     const rpcs3Exe = isRPCS3ExePathValid(selection.filePaths[0])
     return rpcs3Exe.path
   } catch (err) {
-    sendMessageBox(win, {
-      type: 'error',
-      method: 'selectRPCS3Exe',
-      code: 'invalidExecutable',
-      messageValues: { path: selection.filePaths[0] },
-    })
+    sendMessageBox(win, { type: 'error', code: 'selectRPCS3ExeInvalidExecutable', messageValues: { path: selection.filePaths[0] } })
     return false
   }
 })

@@ -2,7 +2,7 @@
 import { ipcRenderer, shell, webUtils, type IpcRenderer, type IpcRendererEvent } from 'electron'
 import type { Promisable } from 'type-fest'
 import type { openUserDataFolder, readUserConfigFile, MessageBoxObject, saveUserConfigFile, UserConfigObject, windowClose, windowMaximize, windowMinimize, BuzyLoadInitObject, BuzyLoadScreenSenderObject, BuzyLoadErrorObject, DialogScreenPromptsTypes, BuzyLoadSubtextObject } from './core.exports'
-import type { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, editPackageData, getDTAFilteringFromPackage, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, playRockBand3, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectAndParseDTAFile, selectDevhdd0Dir, loadImageForCrop, selectPackageFiles, SelectPackageFilesStatsTypes, SelectPKGFileReturnObject, selectPKGFileToInstall, selectRPCS3Exe, testUserConfig, cropImageAndSaveToTemp, CropImageAndSaveToTempOptions, createNewPackage, CreateNewPackageOptions, testBuzyLoad, getScoresFromGoCentral, extractMultitrackFromSong } from './controllers.exports'
+import type { deletePackage, deletePackageThumbnails, deleteUserConfigAndRestart, editPackageData, getDTAFilteringFromPackage, getSongArtworkDataURL, installHighMemoryPatch, installPKGFile, playRockBand3, refreshPackagesData, rpcs3GetInstrumentScores, rpcs3GetPackagesData, rpcs3GetRB3Stats, rpcs3GetSaveDataStats, selectAndParseDTAFile, selectDevhdd0Dir, loadImageForCrop, selectPackageFiles, SelectPackageFilesStatsTypes, SelectPKGFileReturnObject, selectPKGFile, selectRPCS3Exe, testUserConfig, cropImageAndSaveToTemp, CropImageAndSaveToTempOptions, createNewPackage, CreateNewPackageOptions, testBuzyLoad, getScoresFromGoCentral, extractMultitrackFromSong } from './controllers.exports'
 import type { ParsedRB3SaveData, ScoreDataInstrumentTypes } from 'rockshelf-core/rbtools'
 import type { EditPackageDataOptions, RPCS3SongPackagesObjectExtra } from './lib.exports'
 import type { FatalErrorObject } from './lib/senders/fatalError'
@@ -139,7 +139,7 @@ export const rockshelfAPI = {
   selectAndParseDTAFile: async (): ReturnType<typeof selectAndParseDTAFile> => await invoke('selectAndParseDTAFile'),
   selectDevhdd0Dir: async (): ReturnType<typeof selectDevhdd0Dir> => await invoke('selectDevhdd0Dir'),
   selectPackageFiles: async (files: SelectPackageFilesStatsTypes[]): ReturnType<typeof selectPackageFiles> => await invoke('selectPackageFiles', files),
-  selectPKGFileToInstall: async (): ReturnType<typeof selectPKGFileToInstall> => await invoke('selectPKGFileToInstall'),
+  selectPKGFile: async (): ReturnType<typeof selectPKGFile> => await invoke('selectPKGFile'),
   selectRPCS3Exe: async (): ReturnType<typeof selectRPCS3Exe> => await invoke('selectRPCS3Exe'),
   testBuzyLoad: async (): ReturnType<typeof testBuzyLoad> => await invoke('testBuzyLoad'),
   testError: async (message?: string): ReturnType<typeof testUserConfig> => await invoke('testError', message),

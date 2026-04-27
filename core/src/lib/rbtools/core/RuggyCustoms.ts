@@ -1227,7 +1227,7 @@ export class RuggyCustoms {
       yearReleased: 2005,
       songKey: 'C#m',
       author: 'Ruggy, NãoNemEu',
-      multitrack: 'full',
+      multitrack: 'diy_stems',
       customsource: {
         game_origin: 'rbbr',
       },

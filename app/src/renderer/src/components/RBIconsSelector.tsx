@@ -50,7 +50,7 @@ export function RBIconsSelector() {
             onClick={async () => {
               setWindowState({ disableButtons: true })
 
-              setMessageBoxState({ message: { type: 'loading', method: 'rbIconsSelector', code: '' } })
+              setMessageBoxState({ message: { type: 'loading', code: 'rbIconsSelector' } })
               const rbIconURL = `rbicons://${allIcons[selIcon]}`
               if (active === 'editPackage') {
                 try {
@@ -58,7 +58,7 @@ export function RBIconsSelector() {
                   console.log('struct RPCS3SongPackagesDataExtra ["rbtools/src/lib/rpcs3/rpcs3GetSongPackagesStatsExtra.ts"]:', newPackages)
 
                   if (newPackages) setWindowState({ packages: newPackages, disableImg: selPKG })
-                  setMessageBoxState({ message: { type: 'success', method: 'editPackageImage', code: '' } })
+                  setMessageBoxState({ message: { type: 'success',  code: 'editPackageImage' } })
                   resetRBIconsSelectorState()
                 } catch (err) {
                   if (err instanceof Error) setWindowState({ err })
@@ -66,7 +66,7 @@ export function RBIconsSelector() {
               } else if (active === 'createNewPackage') {
                 setCreateNewPackageScreenState({ packageArtwork: `rbicons://custom` })
                 await window.api.cropImageAndSaveToTemp({ imgPath: rbIconURL, name: 'thumbnail' })
-                setMessageBoxState({ message: { type: 'success', method: 'editPackageImage', code: '' } })
+                setMessageBoxState({ message: { type: 'success', code: 'editPackageImage' } })
                 resetRBIconsSelectorState()
                 setCreateNewPackageScreenState({ packageArtwork: `tempjpg://thumbnail` })
               }

@@ -231,24 +231,18 @@ export const extractPackagesForRPCS3Extra = async (win: BrowserWindow, packages:
         // MILO
         const oldMiloPath = song.files.milo
         const newMiloPath = mainTempFolder.gotoFile(`${song.files.milo.name}.milo_ps3`)
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: newMiloPath.fullname } })
         await oldMiloPath.move(newMiloPath, true)
 
         // PNG
         const oldPNGPath = song.files.png
         const newPNGPath = mainTempFolder.gotoFile(`${song.files.png.name}.png_ps3`)
         if (temp.type === 'pkg') {
-          sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: oldPNGPath.fullname } })
           await oldPNGPath.move(newPNGPath, true)
         } else {
           // Xbox PNGs must be converted to PS3
           sendBuzyLoad(win, { code: 'subtext', key: 'convertingXboxPNGText', messageValues: { name: oldPNGPath.fullname } })
-          const tempPNG = pathLikeToFilePath(temporaryFile({ extension: 'png' }))
           const tex = new TextureFile(oldPNGPath)
-          const newImg = await tex.convertToImage(tempPNG, 'png')
-
-          await newImg.convertToTexture(newPNGPath, 'png_ps3')
-          await tempPNG.delete()
+          await tex.convertToTexture(newPNGPath, 'png_ps3')
         }
 
         // MOGG
@@ -284,7 +278,6 @@ export const extractPackagesForRPCS3Extra = async (win: BrowserWindow, packages:
         }
         const newMOGGPath = mainTempFolder.gotoFile(song.files.mogg.fullname)
 
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: oldMOGGPath.path.fullname } })
         await oldMOGGPath.path.move(newMOGGPath, true)
 
         // MIDI
@@ -293,7 +286,6 @@ export const extractPackagesForRPCS3Extra = async (win: BrowserWindow, packages:
 
         // MIDI is decrypted, just move changing the extension to EDAT
         if (temp.type === 'stfs' && forceEncryption === 'disabled') {
-          sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: oldMIDIPath.fullname } })
           await oldMIDIPath.move(newMIDIPath, true)
         } else if (temp.type === 'stfs' && forceEncryption === 'enabled') {
           const newDevkLic = EDATFile.genDevKLicHash(packageFolderName)
@@ -398,13 +390,9 @@ export const extractPackagesForRPCS3Extra = async (win: BrowserWindow, packages:
         const newPNG = songGenFolder.gotoFile(`${newUsedSongname}_keep.png_ps3`)
         const newMILO = songGenFolder.gotoFile(`${newUsedSongname}.milo_ps3`)
 
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: mainTempMOGG.fullname } })
         await mainTempMOGG.move(newMOGG)
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: mainTempMIDI.fullname } })
         await mainTempMIDI.move(newMIDI)
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: mainTempPNG.fullname } })
         await mainTempPNG.move(newPNG)
-        sendBuzyLoad(win, { code: 'subtext', key: 'movingFileText', messageValues: { name: mainTempMILO.fullname } })
         await mainTempMILO.move(newMILO)
 
         const moggStat = await newMOGG.stat()

@@ -6,11 +6,7 @@ export const selectAndParseDTAFile = useHandler(async (win, _) => {
   const selection = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: await getLocaleStringFromRenderer(win, 'dtaFile'), extensions: ['dta'] }] })
 
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'selectAndParseDTAFile',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'selectAndParseDTAFileCancelledByUser' })
     return false
   }
 
@@ -21,7 +17,7 @@ export const selectAndParseDTAFile = useHandler(async (win, _) => {
 
     return dta.toJSON()
   } catch (err) {
-    sendMessageBox(win, { type: 'error', method: 'selectAndParseDTAFile', code: 'parsingError' })
+    sendMessageBox(win, { type: 'error', code: 'selectAndParseDTAFileParsingError' })
     return false
   }
 })

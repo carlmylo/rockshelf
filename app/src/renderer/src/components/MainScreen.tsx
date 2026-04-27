@@ -135,7 +135,7 @@ export function MainScreen() {
                           return
                         }
                         setWindowState({ disableButtons: false, richPresence: false })
-                        setMessageBoxState({ message: { type: 'info', method: 'discordRP', code: 'stopped' } })
+                        setMessageBoxState({ message: { type: 'info', code: 'discordRPStopped' } })
                         return
                       } catch (err) {
                         setWindowState({ disableButtons: false, richPresence: true })
@@ -148,7 +148,7 @@ export function MainScreen() {
                         return
                       }
                       setWindowState({ disableButtons: false, richPresence: true })
-                      setMessageBoxState({ message: { type: 'info', method: 'discordRP', code: 'started' } })
+                      setMessageBoxState({ message: { type: 'info', code: 'discordRPStarted' } })
                       return
                     } catch (err) {
                       setWindowState({ disableButtons: false, richPresence: true })

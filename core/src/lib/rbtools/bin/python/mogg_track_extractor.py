@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import argparse, base64, json
+import argparse
+import base64
+import json
 from pydub import AudioSegment
 from io import BytesIO
 from typing import TypedDict, Optional, List, Literal
@@ -67,13 +69,16 @@ def mogg_track_extractor(
     tracks: AudioFileTracksStructureDocument,
     output_crowd: bool = False,
 ) -> List[AudioSegment]:
+
     fin = open(mogg_file_path, "rb")
-    oggbytes = BytesIO(decrypt_mogg_bytes(True, False, fin.read()))
+    oggbytes = BytesIO(decrypt_mogg_bytes(True, False, fin))
     fin.close()
 
     oggtracks = mogg_import_channel_order_fixer(
         AudioSegment.from_ogg(oggbytes).split_to_mono()
     )
+    
+    oggbytes.close()
 
     duration = round(oggtracks[0].duration_seconds * 1000)
     frame_rate = oggtracks[0].frame_rate
@@ -472,7 +477,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="RBTools: MOGG Track Extractor", epilog="By Ruggery Iury Corrêa."
     )
-    parser.add_argument("mogg_file_path", help="The path to the MOGG file", type=str)
+    parser.add_argument(
+        "mogg_file_path", help="The path to the MOGG file", type=str)
     parser.add_argument(
         "-t",
         "--tracks",
@@ -490,17 +496,18 @@ if __name__ == "__main__":
 
     arg = parser.parse_args()
 
-    tracks: AudioFileTracksStructureDocument = json.loads(base64.b64decode(arg.tracks))
-    
+    tracks: AudioFileTracksStructureDocument = json.loads(
+        base64.b64decode(arg.tracks))
+
     print(tracks)
 
     output = Path(arg.output)
     if not output.exists():
         output.mkdir(parents=True)
-        
+
     audios = mogg_track_extractor(arg.mogg_file_path, tracks, True)
     print(tracks)
-    
+
     drums_path = Path(arg.output, "drums.wav")
     kick_path = Path(arg.output, "kick.wav")
     snare_path = Path(arg.output, "snare.wav")

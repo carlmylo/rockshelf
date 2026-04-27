@@ -89,7 +89,7 @@ export function FirstTimeScreen() {
         {...animate({ opacity: true, height: true, scaleY: true })}
         onClick={async () => {
           setWindowState({ disableButtons: true })
-          setMessageBoxState({ message: { type: 'loading', method: 'firstTimeData', code: '' } })
+          setMessageBoxState({ message: { type: 'loading', code: 'firstTimeData' } })
           try {
             await window.api.saveUserConfigFile({
               devhdd0Path,

@@ -18,15 +18,11 @@ export const selectPackageFiles = useHandler(async (win, _, files: SelectPackage
   const selection = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
 
   if (selection.canceled) {
-    sendMessageBox(win, {
-      type: 'info',
-      method: 'selectPackageFiles',
-      code: 'actionCancelledByUser',
-    })
+    sendMessageBox(win, { type: 'info', code: 'selectPackageFilesCancelledByUser' })
     return false
   }
 
-  sendMessageBox(win, { type: 'loading', method: 'selectPackageFiles', code: `processing${selection.filePaths.length === 1 ? '' : 'Plural'}` })
+  sendMessageBox(win, { type: 'loading', code: `selectPackageFilesProcessing${selection.filePaths.length === 1 ? '' : 'Plural'}` })
 
   const allStats: SelectPackageFilesStatsTypes[] = []
 

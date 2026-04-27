@@ -11,6 +11,7 @@ import { useEffect, useMemo } from 'react'
 import type { SelectPackageFilesStatsTypes } from 'rockshelf-core'
 import { useImageCropScreenState } from './ImageCropScreen.state'
 import { useRBIconsSelectorState } from './RBIconsSelector.state'
+import { useDeluxeInstallScreenState } from './DeluxeInstallScreen.state'
 
 export function CreateNewPackageScreen() {
   const { t } = useTranslation()
@@ -19,6 +20,7 @@ export function CreateNewPackageScreen() {
   const { setMessageBoxState } = useMessageBoxState(useShallow((x) => ({ setMessageBoxState: x.setMessageBoxState })))
   const { setImageCropScreenState } = useImageCropScreenState(useShallow((x) => ({ setImageCropScreenState: x.setImageCropScreenState })))
   const { setRBIconsSelectorState } = useRBIconsSelectorState(useShallow((x) => ({ setRBIconsSelectorState: x.setRBIconsSelectorState })))
+  const { setDeluxeInstallScreenState } = useDeluxeInstallScreenState(useShallow((x) => ({ setDeluxeInstallScreenState: x.setDeluxeInstallScreenState })))
 
   const isReadyToInstall = useMemo(() => packageName.length > 0 && packageFolderName.length > 0 && files.length > 0, [packageName, packageFolderName, files])
 
@@ -61,7 +63,7 @@ export function CreateNewPackageScreen() {
               setWindowState({ disableButtons: false })
             }}
           >
-            {t('install')}
+            {t('create')}
           </button>
           <button
             disabled={disableButtons}
@@ -109,7 +111,7 @@ export function CreateNewPackageScreen() {
           <div className="mb-4 w-full flex-row! items-center rounded-sm border border-neutral-900 bg-neutral-800 px-3 py-1">
             <button
               disabled={disableButtons}
-              className="w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+              className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
               onClick={async () => {
                 setWindowState({ disableButtons: true })
                 try {
@@ -120,12 +122,12 @@ export function CreateNewPackageScreen() {
                     const { selectedFiles, ignoredFiles, duplicatedFiles } = selFiles
 
                     if (ignoredFiles.length === 0 && duplicatedFiles.length === 0) {
-                      setMessageBoxState({ message: { type: 'info', method: 'selectPackageFiles', code: `packagesAdded${selectedFiles.length === 1 ? '' : 'Plural'}`, messageValues: { selectedFiles: selectedFiles.length } } })
+                      setMessageBoxState({ message: { type: 'info', code: `selectPackageFilesPackagesAdded${selectedFiles.length === 1 ? '' : 'Plural'}`, messageValues: { selectedFiles: selectedFiles.length } } })
                     } else if (selectedFiles.length > 0 && (ignoredFiles.length > 0 || duplicatedFiles.length > 0)) {
-                      if (ignoredFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', method: 'selectPackageFiles', code: `allIgnored${selectedFiles.length === 1 ? '' : 'Plural'}` } })
-                      else if (duplicatedFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', method: 'selectPackageFiles', code: `allDuplicated${selectedFiles.length === 1 ? '' : 'Plural'}` } })
-                      else if (selectedFiles.length === ignoredFiles.length + duplicatedFiles.length) setMessageBoxState({ message: { type: 'warn', method: 'selectPackageFiles', code: `allIgnoredOrDuplicated` } })
-                      else setMessageBoxState({ message: { type: 'warn', method: 'selectPackageFiles', code: `someIgnoredOrDuplicated`, messageValues: { addedFiles: selectedFiles.length - (ignoredFiles.length + duplicatedFiles.length), ignoredFiles: ignoredFiles.length, duplicatedFiles: duplicatedFiles.length } } })
+                      if (ignoredFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllIgnored${selectedFiles.length === 1 ? '' : 'Plural'}` } })
+                      else if (duplicatedFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllDuplicated${selectedFiles.length === 1 ? '' : 'Plural'}` } })
+                      else if (selectedFiles.length === ignoredFiles.length + duplicatedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllIgnoredOrDuplicated` } })
+                      else setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesSomeIgnoredOrDuplicated`, messageValues: { addedFiles: selectedFiles.length - (ignoredFiles.length + duplicatedFiles.length), ignoredFiles: ignoredFiles.length, duplicatedFiles: duplicatedFiles.length } } })
                     }
                     setCreateNewPackageScreenState((oldState) => {
                       return { files: selFiles.stats, addedSongsCount: oldState.addedSongsCount + selFiles.addedSongsCount, addedStarsCount: oldState.addedStarsCount + selFiles.addedStarsCount }
@@ -138,6 +140,48 @@ export function CreateNewPackageScreen() {
               }}
             >
               {t('addPackageFiles')}
+            </button>
+            <button
+              disabled={disableButtons}
+              className="mr-2 w-fit self-start rounded-xs border border-neutral-700 bg-neutral-900 px-1 py-0.5 text-xs! uppercase duration-100 last:mr-0 hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-700 disabled:hover:bg-neutral-900"
+              onClick={async () => {
+                setWindowState({ disableButtons: true })
+                try {
+                  const newSelectedPKG = await window.api.selectPKGFile()
+                  console.log('struct SelectPKGFileReturnObject [core/src/controllers/selectPKGFile.ts]', newSelectedPKG)
+                  if (newSelectedPKG) {
+                    if (newSelectedPKG.pkgType === 'songPackage') {
+                      setMessageBoxState({ message: { type: 'error', code: 'createNewPackageUseCreationForUnnofficialPackage', timeout: 6000 } })
+                    }
+                    if (newSelectedPKG.pkgType === 'dx') {
+                      setDeluxeInstallScreenState({ active: true, selectedPKG: newSelectedPKG })
+                    }
+                  }
+                  // const selFiles = await window.api.selectPackageFiles(files)
+                  // console.log('struct SelectPackageFilesObject ["core/src/controllers/selectPackageFiles.ts"]:', selFiles)
+
+                  // if (selFiles) {
+                  //   const { selectedFiles, ignoredFiles, duplicatedFiles } = selFiles
+
+                  //   if (ignoredFiles.length === 0 && duplicatedFiles.length === 0) {
+                  //     setMessageBoxState({ message: { type: 'info', code: `selectPackageFilesPackagesAdded${selectedFiles.length === 1 ? '' : 'Plural'}`, messageValues: { selectedFiles: selectedFiles.length } } })
+                  //   } else if (selectedFiles.length > 0 && (ignoredFiles.length > 0 || duplicatedFiles.length > 0)) {
+                  //     if (ignoredFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllIgnored${selectedFiles.length === 1 ? '' : 'Plural'}` } })
+                  //     else if (duplicatedFiles.length === selectedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllDuplicated${selectedFiles.length === 1 ? '' : 'Plural'}` } })
+                  //     else if (selectedFiles.length === ignoredFiles.length + duplicatedFiles.length) setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesAllIgnoredOrDuplicated` } })
+                  //     else setMessageBoxState({ message: { type: 'warn', code: `selectPackageFilesSomeIgnoredOrDuplicated`, messageValues: { addedFiles: selectedFiles.length - (ignoredFiles.length + duplicatedFiles.length), ignoredFiles: ignoredFiles.length, duplicatedFiles: duplicatedFiles.length } } })
+                  //   }
+                  //   setCreateNewPackageScreenState((oldState) => {
+                  //     return { files: selFiles.stats, addedSongsCount: oldState.addedSongsCount + selFiles.addedSongsCount, addedStarsCount: oldState.addedStarsCount + selFiles.addedStarsCount }
+                  //   })
+                  // }
+                } catch (err) {
+                  if (err instanceof Error) setWindowState({ err })
+                }
+                setWindowState({ disableButtons: false })
+              }}
+            >
+              {t('installPKGFile')}
             </button>
           </div>
 

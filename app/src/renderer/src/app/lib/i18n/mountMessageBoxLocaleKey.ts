@@ -1,23 +1,16 @@
+import { uppercaseFirstLetter } from '@renderer/lib.exports'
 import type { MessageBoxObject } from 'rockshelf-core'
 
 export const mountMessageBoxLocaleKey = (msgObject: MessageBoxObject | null) => {
-  let value = ''
-  if (!msgObject) return value
+  let key = ''
+  if (!msgObject) return key
 
-  value += msgObject.type
-  if (msgObject.method && msgObject.method.length >= 2) {
-    const firstLetterUppercased = msgObject.method.at(0)!.toUpperCase()
-    const slicedString = msgObject.method.slice(1)
-    value += firstLetterUppercased
-    value += slicedString
+  key += msgObject.type
+
+  if (msgObject.code.length > 0) {
+    const codeWithFirstLetterUppercased = uppercaseFirstLetter(msgObject.code)
+    key += codeWithFirstLetterUppercased
   }
 
-  if (msgObject.code && msgObject.code.length > 1) {
-    const firstLetterUppercased = msgObject.code.at(0)!.toUpperCase()
-    const slicedString = msgObject.code.slice(1)
-    value += firstLetterUppercased
-    value += slicedString
-  }
-
-  return value
+  return key
 }
