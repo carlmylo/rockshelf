@@ -50,14 +50,15 @@ export function SongDetails() {
       const start = async () => {
         if (!packageDetails || !songDetails) return
 
-        if (packageDetails.official?.code === 'rb3') {
-          setMyPackagesScreenState({ isArtworkLoading: false, artworkURL: `rb3art://${songDetails.songname}` })
+        if (packageDetails.official?.code === 'rb3' || packageDetails.official?.code === 'rb1') {
+          setMyPackagesScreenState({ isArtworkLoading: false, artworkURL: `rbart://${songDetails.songname}` })
           return
         }
 
         try {
           const artworkDataURL = await window.api.getSongArtworkDataURL(packageDetails, songDetails)
           if (artworkDataURL) setMyPackagesScreenState({ artworkURL: artworkDataURL, isArtworkLoading: false })
+            else  setMyPackagesScreenState({ artworkURL: packageDetails.thumbnailSrc, isArtworkLoading: false })
         } catch (err) {
           if (err instanceof Error) setWindowState({ err })
         }
@@ -181,9 +182,11 @@ export function SongDetails() {
                 <h1>Song Entry</h1>
                 <p>{songDetails.id}</p>
                 <h1>Internal name</h1>
-                <p>{songDetails.songname}</p>
-                <h1>Song ID</h1>
-                <p className="mb-8">{songDetails.song_id}</p>
+                <p className='select-text'>{songDetails.songname}</p>
+                <h1 className=''>Song ID</h1>
+                <p className="">{songDetails.song_id}</p>
+                <h1>Tuning Offset</h1>
+                <p className="">{songDetails.tuning_offset_cents || 0}</p>
 
                 <div className="mt-auto px-16">
                   <div className="flex-row! items-center">
@@ -489,7 +492,7 @@ export function SongDetails() {
                   </div>
                   {allTracksCount !== undefined && (
                     <p className="mb-1 text-xs italic">
-                      <TransComponent i18nKey={allTracksCount === 1 ? 'tracksCount' : 'tracksCountPlural'} values={{ allTracksCount, multitrack: t(songDetails.multitrack === null || !songDetails.multitrack ? 'mtSingleTrack' : `mt${underscoreToUppercaseLetter(songDetails.multitrack, true)}`) }} />
+                      <TransComponent i18nKey={allTracksCount === 1 ? 'tracksCount' : 'tracksCountPlural'} values={{ allTracksCount, multitrack: t(typeof songDetails.multitrack !== 'string' && !packageDetails?.official ? 'mtSingleTrack' : `mt${underscoreToUppercaseLetter(songDetails.multitrack || 'full', true)}`) }} />
                     </p>
                   )}
                   <div className="mb-4 h-8 w-full flex-row! items-center">
@@ -585,7 +588,7 @@ export function SongDetails() {
                       setWindowState({ disableButtons: true })
                       if (packageDetails) {
                         try {
-                          await window.api.extractMultitrackOrSongAudioFromSong(packageDetails.path, songDetails)
+                          await window.api.extractMultitrackOrSongAudioFromSong(packageDetails, songDetails)
                         } catch (err) {
                           if (err instanceof Error) setWindowState({ err })
                         }
@@ -593,7 +596,7 @@ export function SongDetails() {
                       setWindowState({ disableButtons: false })
                     }}
                   >
-                    {t(!songDetails.multitrack || songDetails.multitrack === null ? 'extractSongAudioTrack' : 'extractTracks')}
+                    {t(typeof songDetails.multitrack !== 'string' && !packageDetails?.official ? 'extractSongAudioTrack' : 'extractTracks')}
                   </button>
                 </div>
               </div>

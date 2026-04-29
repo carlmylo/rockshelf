@@ -86,9 +86,9 @@ export async function initRockshelfMainProcess(options: CreateWindowOptions): Pr
     })
   })
 
-  protocol.handle('rb3art', async (request) => {
+  protocol.handle('rbart', async (request) => {
     const root = getRockshelfModuleRootDir()
-    const songShortname = request.url.slice('rb3art://'.length)
+    const songShortname = request.url.slice('rbart://'.length)
     const artwork = root.gotoFile(`bin/artworks/${songShortname}_keep.png`)
 
     if (!artwork.exists) return new Response(null)

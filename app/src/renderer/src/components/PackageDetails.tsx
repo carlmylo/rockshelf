@@ -345,6 +345,10 @@ export function PackageDetails() {
                         <div className="h-2 w-full" />
                         <p className="text-xs text-red-500 italic">{t('decryptedPackageWODeluxeWarningText')}</p>
                       </AnimatedDiv>
+                      <AnimatedDiv condition={active.packageData.encryptionStatus === 'unknown'}>
+                        <div className="h-2 w-full" />
+                        <p className="text-xs text-red-500 italic">{t('unknownPKGEncWarningText')}</p>
+                      </AnimatedDiv>
                     </div>
                     <div className="group rounded-xs p-2 duration-200 last:mb-0 hover:bg-white/5">
                       <h1 className="mb-1 uppercase">{t('packageHash')}</h1>

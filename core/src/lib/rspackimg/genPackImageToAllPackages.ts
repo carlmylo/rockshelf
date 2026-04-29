@@ -10,7 +10,7 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
 
   const rb3UsrDir = getRB3USRDIR(devhdd0)
   if (rb3UsrDir.exists) {
-    const allRB3PackagesFolder = (await rb3UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name === 'custom_textures') as DirPath[]
+    const allRB3PackagesFolder = (await rb3UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== 'custom_textures') as DirPath[]
 
     if (allRB3PackagesFolder.length > 0) {
       for (const packagePath of allRB3PackagesFolder) {
@@ -28,7 +28,10 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
         const { manifest, packageSize, packageFiles } = await rpcs3GenSongPackageManifest(packagePath)
         const contentsHash = createHashFromBuffer(Buffer.from(manifest))
         const official = getOfficialSongPackageStatsFromHash('extractedRPCS3', contentsHash)
-        if (official?.isDuplicatedForRB3) continue
+        if (official) {
+          if (official.isDuplicatedForRB3) continue
+          await parsedData.applyDXUpdatesOnSongs()
+        }
 
         const thumbnailSrc = packagePath.gotoFile('folder.jpg')
         if (!thumbnailSrc.exists) {
@@ -39,17 +42,21 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
               const temp = await texture.convertToImage(temporaryFile({ extension: '.jpg' }), 'jpg')
               await createRSPackImage(temp.path, thumbnailSrc, { source: 'merged', type: 'other', encryptionStatus: 'unknown', packageName: `${onlySong.name} - ${onlySong.artist}` })
               await temp.path.delete()
-              return
+            } else {
+              const newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+              await createRSPackImage(newPackageImage, thumbnailSrc, { source: 'merged', type: 'other', encryptionStatus: 'unknown', packageName: `${onlySong.name} - ${onlySong.artist}` })
             }
+          } else {
+            let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
+            if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+            await createRSPackImage(newPackageImage, thumbnailSrc, { source: official ? 'pkg' : 'merged', type: 'other', encryptionStatus: official ? 'encrypted' : 'unknown', packageName: official?.name || packagePath.name })
           }
-          let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
-          if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
-          await createRSPackImage(newPackageImage, thumbnailSrc, { source: 'merged', type: 'other', encryptionStatus: 'unknown', packageName: official?.name || packagePath.name })
         }
       }
     }
 
     const rb1UsrDir = getRB1USRDIR(devhdd0)
+
     if (rb1UsrDir.exists) {
       const allRB1PackagesFolder = (await rb1UsrDir.readDir()).filter((entry) => entry instanceof DirPath && entry.name !== 'gen' && entry.name !== 'CCF0099') as DirPath[]
 
@@ -74,6 +81,8 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
           if (!official) continue
           if (official?.isDuplicatedForRB3) continue
 
+          await parsedData.applyDXUpdatesOnSongs()
+
           const thumbnailSrc = packagePath.gotoFile('folder.jpg')
 
           if (!thumbnailSrc.exists) {
@@ -84,12 +93,15 @@ export const genPackImageToAllPackages = async (devhdd0Path: DirPathLikeTypes) =
                 const temp = await texture.convertToImage(temporaryFile({ extension: '.jpg' }), 'jpg')
                 await createRSPackImage(temp.path, thumbnailSrc, { source: 'pkg', type: 'other', encryptionStatus: 'unknown', packageName: `${onlySong.name} - ${onlySong.artist}` })
                 await temp.path.delete()
-                return
+              } else {
+                const newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+                await createRSPackImage(newPackageImage, thumbnailSrc, { source: 'merged', type: 'other', encryptionStatus: 'unknown', packageName: `${onlySong.name} - ${onlySong.artist}` })
               }
+            } else {
+              let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
+              if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
+              await createRSPackImage(newPackageImage, thumbnailSrc, { source: 'pkg', type: 'other', encryptionStatus: 'encrypted', packageName: official?.name || packagePath.name })
             }
-            let newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/${official?.code}.jpg`)
-            if (!newPackageImage.exists) newPackageImage = getRockshelfModuleRootDir().gotoFile(`bin/icons/custom.jpg`)
-            await createRSPackImage(newPackageImage, thumbnailSrc, { source: 'pkg', type: 'other', encryptionStatus: 'unknown', packageName: official?.name ?? packagePath.name })
           }
         }
       }

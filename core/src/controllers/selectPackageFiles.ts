@@ -2,6 +2,7 @@ import { dialog } from 'electron'
 import { sendMessageBox, useHandler } from '../core.exports'
 import { pathLikeToFilePath } from 'node-lib'
 import { type STFSFileJSONRepresentation, type PKGFileJSONRepresentation, STFSFile, PKGFile } from '../lib/rbtools'
+import { getOfficialSongPackageStatsFromHash } from '../lib/rbtools/lib.exports'
 
 export type SelectPackageFilesStatsTypes = { type: 'stfs'; data: STFSFileJSONRepresentation } | { type: 'pkg'; data: PKGFileJSONRepresentation }
 
@@ -52,8 +53,9 @@ export const selectPackageFiles = useHandler(async (win, _, files: SelectPackage
       try {
         await pkg.checkFileIntegrity()
         const data = await pkg.toJSON()
+        const official = getOfficialSongPackageStatsFromHash('pkg', data.contentsHash)
 
-        if (data.dta.length === 0) {
+        if (data.dta.length === 0 || official) {
           ignoredFiles.push(stfs.path.path)
           continue
         }

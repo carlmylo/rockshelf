@@ -14,6 +14,7 @@ export const rpcs3GetPackagesData = useHandler(async (win, _, forceUpdate: boole
   }
 
   const devhdd0 = isRPCS3Devhdd0PathValid(userConfig.devhdd0Path)
+  await genPackImageToAllPackages(devhdd0)
 
   const cache = getPackagesCacheFile()
 
@@ -37,7 +38,6 @@ export const rpcs3GetPackagesData = useHandler(async (win, _, forceUpdate: boole
   if (!forceCacheUpdate) {
     try {
       sendMessageBox(win, { type: 'info', code: 'rpcs3GetPackagesDataReadingFromCache' })
-      await genPackImageToAllPackages(devhdd0)
       const cacheContents = await cache.readJSON<RPCS3SongPackagesDataExtra>()
       if (typeof cacheContents !== 'object' || (typeof cacheContents === 'object' && cacheContents === null)) throw new Error(`Rockshelf's cache file returned a ${typeof cacheContents} and it's not valid.`)
       if (cacheContents.parsingErrors.length > 0) sendDialog(win, 'parsingErrorsOnPackagesDTA')

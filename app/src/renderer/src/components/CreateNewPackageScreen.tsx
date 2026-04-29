@@ -258,6 +258,11 @@ export function CreateNewPackageScreen() {
               <p className="mb-4 text-xs italic">
                 <TransComponent i18nKey="packageEncryptionDesc" />
               </p>
+
+              <AnimatedDiv condition={forceEncryption === 'enabled' && typeof rb3Stats === 'object' && rb3Stats.hasDeluxe} {...animate({ opacity: true, height: true, scaleY: true })} className="origin-top">
+                <p className="text-xs text-yellow-500 italic">{t('unnecessaryEncForDeluxe')}</p>
+                <div className="h-2 w-full" />
+              </AnimatedDiv>
               <div className="w-fit flex-row! items-center">
                 <button
                   disabled={disableButtons}
@@ -279,10 +284,6 @@ export function CreateNewPackageScreen() {
                 </button>
               </div>
 
-              <AnimatedDiv condition={forceEncryption === 'enabled' && typeof rb3Stats === 'object' && rb3Stats.hasDeluxe} {...animate({ opacity: true, height: true, scaleY: true })} className="origin-top">
-                <div className="h-2 w-full" />
-                <p className="text-xs text-yellow-500 italic">{t('unnecessaryEncForDeluxe')}</p>
-              </AnimatedDiv>
               <AnimatedDiv condition={forceEncryption === 'disabled' && typeof rb3Stats === 'object' && !rb3Stats.hasDeluxe} {...animate({ opacity: true, height: true, scaleY: true })} className="origin-top">
                 <div className="h-2 w-full" />
                 <p className="text-xs text-yellow-500 italic">{t('necessaryEncForVanilla')}</p>

@@ -3,9 +3,10 @@ import { dialog } from 'electron'
 import { getLocaleStringFromRenderer, sendMessageBox, useHandler } from '../core.exports'
 import { MOGGFile, PythonAPI } from '../lib/rbtools'
 import type { RB3CompatibleDTAFile } from '../lib/rbtools/lib.exports'
+import type { RPCS3SongPackagesObjectExtra } from '../lib.exports'
 
-export const extractMultitrackOrSongAudioFromSong = useHandler(async (win, __, packagePath: string, song: RB3CompatibleDTAFile) => {
-  const packPath = pathLikeToDirPath(packagePath)
+export const extractMultitrackOrSongAudioFromSong = useHandler(async (win, __, packageDetails: RPCS3SongPackagesObjectExtra, song: RB3CompatibleDTAFile) => {
+  const packPath = pathLikeToDirPath(packageDetails.path)
 
   const mogg = new MOGGFile(packPath.gotoFile(`songs/${song.songname}/${song.songname}.mogg`))
 
@@ -21,7 +22,7 @@ export const extractMultitrackOrSongAudioFromSong = useHandler(async (win, __, p
     return false
   }
 
-  if (!song.multitrack || song.multitrack === null) {
+  if (typeof song.multitrack !== 'string' && !packageDetails?.official) {
     const buttonLabel = await getLocaleStringFromRenderer(win, 'saveAudioFile')
     const wavExtName = await getLocaleStringFromRenderer(win, 'wavFile')
     const title = await getLocaleStringFromRenderer(win, 'saveSingleAudioTrackTitle')
